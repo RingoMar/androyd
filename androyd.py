@@ -227,6 +227,10 @@ class sitinchat(Thread):
                     if str(cmds[0]) == "!ping":
                         sock.send(("PRIVMSG {} :{}\r\n").format(
                             chan, "Pong!").encode("utf-8"))
+                    elif str(cmds[0]) == "!version":
+                        req = requests.get("https://raw.githubusercontent.com/RingoMar/androyd/master/version.json", timeout=10).json()
+                        sock.send(("PRIVMSG {} :Androyd Version: {}\r\n").format(
+                            chan, req["version"]).encode("utf-8"))
                     # ErrorData.error(e)
                     # ErrorData.info('"{}"'.format(_line))
                     # ErrorData.error(traceback.format_exc())
