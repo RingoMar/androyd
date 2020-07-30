@@ -252,13 +252,6 @@ class sitinchat(Thread):
                     if str(cmds[0]) == "!ping":
                         sock.send(("PRIVMSG {} :{}\r\n").format(
                             chan, "Pong!").encode("utf-8"))
-                    elif str(cmds[0]) == "!blacklist" and DPN.lower() == "ringomar" or DPN.lower() == "oythebrave" :
-                        configFile = loadFile("config.json")
-                        configFile["blacklisthello"].append(cmds[1].lower())
-                        saveFile("config.json", configFile)
-                        sock.send(("PRIVMSG {} :{}\r\n").format(
-                            chan, "Adding them to the LIST zaqNA").encode("utf-8"))
-
                     elif str(cmds[0]) == "!version":
                         req = requests.get("https://raw.githubusercontent.com/RingoMar/androyd/master/version.json", timeout=10).json()
                         sock.send(("PRIVMSG {} :Androyd Version: {}\r\n").format(
