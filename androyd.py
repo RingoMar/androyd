@@ -33,6 +33,7 @@ seen = []
 lastping = dt.now().strftime('%Y%m%d%H%M%S')
 lastmessage = dt.now().strftime('%Y%m%d%H%M%S')
 lastwave = ""
+emotecool = ""
 
 
 def loadFile(name):
@@ -69,7 +70,6 @@ class sitinchat(Thread):
 
     def shouldSayHi(self):
         global lastwave
-        configFile = loadFile("config.json")
         tnow = str(dt.now().strftime('%Y%m%d%H%M%S'))
         format = '%Y%m%d%H%M%S'
         if lastwave == "":
@@ -77,6 +77,19 @@ class sitinchat(Thread):
 
         delta = dt.strptime(tnow, format) - dt.strptime(lastwave, format)
         if int(delta.total_seconds()) > 5:
+            return True
+        else:
+            return False
+
+    def shouldEmote(self):
+        global emotecool
+        tnow = str(dt.now().strftime('%Y%m%d%H%M%S'))
+        format = '%Y%m%d%H%M%S'
+        if emotecool == "":
+            return True
+
+        delta = dt.strptime(tnow, format) - dt.strptime(emotecool, format)
+        if int(delta.total_seconds()) > 120:
             return True
         else:
             return False
@@ -113,6 +126,7 @@ class sitinchat(Thread):
         global lastmessage
         global lastwave
         global seen
+        global emotecool
         pringtime = ("{:{tfmt}}".format(dt.now(), tfmt="%H:%M:%S"))
         buffer = ""
         buffer += sock.recv(2048).decode('utf-8')
@@ -231,6 +245,20 @@ class sitinchat(Thread):
                         req = requests.get("https://raw.githubusercontent.com/RingoMar/androyd/master/version.json", timeout=10).json()
                         sock.send(("PRIVMSG {} :Androyd Version: {}\r\n").format(
                             chan, req["version"]).encode("utf-8"))
+                    elif "zaqT" in str(pri[1]):
+                        if self.shouldEmote():
+                            emotecool = dt.now().strftime('%Y%m%d%H%M%S')
+                            sock.send(("PRIVMSG {} :{}\r\n").format(
+                                chan, "zaqT").encode("utf-8"))
+                    elif "zaqCA" in str(pri[1]) or "zaqCop" in str(pri[1]):
+                        if self.shouldEmote():
+                            emotecool = dt.now().strftime('%Y%m%d%H%M%S')
+                            sock.send(("PRIVMSG {} :{}\r\n").format(
+                                chan, "zaqCA").encode("utf-8"))
+                    elif DPN == "RichardHarrow_" and "1v1" in str(pri[1]):
+                            sock.send(("PRIVMSG {} :{}\r\n").format(
+                                chan, "!roll").encode("utf-8"))
+
                     # ErrorData.error(e)
                     # ErrorData.info('"{}"'.format(_line))
                     # ErrorData.error(traceback.format_exc())
