@@ -68,16 +68,23 @@ class sitinchat(Thread):
         else:
             return False
 
-    def shouldSayHi(self):
+    def shouldSayHi(self, uName):
         global lastwave
+        configFile = loadFile("config.json")
         tnow = str(dt.now().strftime('%Y%m%d%H%M%S'))
         format = '%Y%m%d%H%M%S'
         if lastwave == "":
-            return True
+            if str(uName.lower()) in configFile["blacklisthello"]:
+                return False
+            else:
+                return True
 
         delta = dt.strptime(tnow, format) - dt.strptime(lastwave, format)
         if int(delta.total_seconds()) > 5:
-            return True
+            if str(uName.lower()) in configFile["blacklisthello"]:
+                return False
+            else:
+                return True
         else:
             return False
 
@@ -226,7 +233,7 @@ class sitinchat(Thread):
 
                     try:
                         if str(cmds[0]).lower() in greetingWord or str(cmds[1]).lower() in greetingWord:
-                            if self.shouldSayHi():
+                            if self.shouldSayHi(DPN):
                                 if DPN not in seen:
                                     sock.send(("PRIVMSG {} :{} {}\r\n").format(
                                         chan, random.choice(greetings), DPN).encode("utf-8"))
@@ -234,6 +241,10 @@ class sitinchat(Thread):
                                 else:
                                     print(
                                         Fore.BLUE + "[GREETING INFO] " + f"[{pringtime}]" + Style.RESET_ALL + f"I saw {DPN} today already, I won't be greeting.")
+                            else:
+                                print(
+                                    Fore.BLUE + "[GREETING INFO] " + f"[{pringtime}]" + Style.RESET_ALL + f"{DPN} Doesn't like when I say Hi to them. sadKEK")
+                                
                                 lastwave = dt.now().strftime('%Y%m%d%H%M%S')
                     except IndexError:
                         pass
@@ -241,6 +252,13 @@ class sitinchat(Thread):
                     if str(cmds[0]) == "!ping":
                         sock.send(("PRIVMSG {} :{}\r\n").format(
                             chan, "Pong!").encode("utf-8"))
+                    elif str(cmds[0]) == "!blacklist" and DPN.lower() == "ringomar" or DPN.lower() == "oythebrave" :
+                        configFile = loadFile("config.json")
+                        configFile["blacklisthello"].append(cmds[1].lower())
+                        saveFile("config.json", configFile)
+                        sock.send(("PRIVMSG {} :{}\r\n").format(
+                            chan, "Adding them to the LIST zaqNA").encode("utf-8"))
+
                     elif str(cmds[0]) == "!version":
                         req = requests.get("https://raw.githubusercontent.com/RingoMar/androyd/master/version.json", timeout=10).json()
                         sock.send(("PRIVMSG {} :Androyd Version: {}\r\n").format(
