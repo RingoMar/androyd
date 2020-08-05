@@ -221,6 +221,7 @@ class sitinchat(Thread):
                     pri = _line.split(findprv)
                     cmds = re.split(" ", pri[1])
                     user = re.search(r"display-name=([a-zA-Z0-9-_\w]+)", _line)
+                    zaqT = re.search(r"(zaqT$)", pri[1])
                     try:
                         DPN += user.group(1)
                     except AttributeError:
@@ -256,7 +257,7 @@ class sitinchat(Thread):
                         req = requests.get("https://raw.githubusercontent.com/RingoMar/androyd/master/version.json", timeout=10).json()
                         sock.send(("PRIVMSG {} :Androyd Version: {}\r\n").format(
                             chan, req["version"]).encode("utf-8"))
-                    elif "zaqT" in str(pri[1]):
+                    elif zaqT:
                         if self.shouldEmote():
                             emotecool = dt.now().strftime('%Y%m%d%H%M%S')
                             sock.send(("PRIVMSG {} :{}\r\n").format(
