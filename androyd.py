@@ -141,10 +141,11 @@ class sitinchat(Thread):
         buffer = temp.pop()
         greetingWord = ["hey", "hi", "hello", "sup", "zaqHi", "yo"]
         greetings = ["Hey", "Hi", "Hello", "Sup",
-                     "zaqHi", "zaqWave", "zaqHugA", "Waddup"]
+                     "zaqHi", "zaqWave", "zaqHugA", "Waddup", "Oh Hey", "DONTPETTHERACCOON Hey"]
         try:
             for line in temp:
-                print(line)
+                if not "PRIVMSG" in line:
+                    print(line)
                 _line = str(line.encode("utf-8").decode("utf-8"))
                 if line == "PING :tmi.twitch.tv":
                     lastping = dt.now().strftime('%Y%m%d%H%M%S')
@@ -156,11 +157,13 @@ class sitinchat(Thread):
                         r"system-msg=[a-zA-Z0-9-_\w]+ (gifted)", _line.replace("\s", " "))
                     try:
                         if str(messagetype.group(1)) == "resub":
+                            giftcount = 0
                             print(Fore.BLUE + "[USERNOTICE INFO] " +
                                   Style.RESET_ALL + f"[{pringtime}] - RESUB")
                             sock.send(("PRIVMSG {} :{}\r\n").format(
                                 chan, submsgmsg).encode("utf-8"))
                         elif str(messagetype.group(1)) == "sub":
+                            giftcount = 0
                             print(Fore.BLUE + "[USERNOTICE INFO] " +
                                   Style.RESET_ALL + f"[{pringtime}] - SUB")
                             sock.send(("PRIVMSG {} :{}\r\n").format(
@@ -253,6 +256,12 @@ class sitinchat(Thread):
                     if str(cmds[0]) == "!ping":
                         sock.send(("PRIVMSG {} :{}\r\n").format(
                             chan, "Pong!").encode("utf-8"))
+                    elif str(cmds[0]) == "!blacklist" and DPN.lower() == "ringomar" or str(cmds[0]) == "!blacklist" and DPN.lower() == "oythebrave" :	
+                        configFile = loadFile("config.json")	
+                        configFile["blacklisthello"].append(cmds[1].lower())	
+                        saveFile("config.json", configFile)	
+                        sock.send(("PRIVMSG {} :{}\r\n").format(	
+                            chan, "Adding them to the LIST zaqNA").encode("utf-8"))                            
                     elif str(cmds[0]) == "!version":
                         req = requests.get("https://raw.githubusercontent.com/RingoMar/androyd/master/version.json", timeout=10).json()
                         sock.send(("PRIVMSG {} :Androyd Version: {}\r\n").format(
