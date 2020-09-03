@@ -7,6 +7,7 @@ import random
 import re
 import socket
 import sys
+import time
 import traceback
 from datetime import datetime as dt
 from threading import Thread
@@ -56,6 +57,9 @@ class sitinchat(Thread):
         Thread.__init__(self)
         self.daemon = True
         self.start()
+        self.pingged = False
+        self.ping_sent = ""
+        self.before = ""
 
     def randommessage(self):
         global lastmessage
@@ -126,6 +130,23 @@ class sitinchat(Thread):
         intstart = False
         return
 
+    def ping(self, text):
+        if str("PRIVMSG") in text:
+            stream = re.search(r"#([a-zA-Z0-9-_\w]+) :", text)
+            currchan = stream.group(1)
+            findprv = ("PRIVMSG #{} :".format(stream.group(1)))
+            pri = text.split(findprv)
+            cmds = re.split(" ", pri[1])
+            if str(cmds[0]) == "!ping":
+                self.pingged = True
+                ttime = dt.now().strftime('%Y%m%d%H%M%S')
+                self.ping_sent = ttime
+                self.before = time.monotonic()
+                sock.send(("PRIVMSG #rinb0t_ :pong!\r\n").encode("utf-8"))
+                sock.send(("ping\r\n").encode("utf-8"))
+
+        return
+
     def readfuntion(self):
         global lastping
         global mgft
@@ -140,12 +161,21 @@ class sitinchat(Thread):
         temp = buffer.split("\r\n")
         buffer = temp.pop()
         greetingWord = ["hey", "hi", "hello", "sup", "zaqHi", "yo"]
-        greetings = ["Hey", "Hi", "Hello", "Sup",
+        greetings = ["Hey", "Hi", "Hello", "Sup", "Hola", "Bonjour"
                      "zaqHi", "zaqWave", "zaqHugA", "Waddup", "Oh Hey", "DONTPETTHERACCOON Hey"]
         try:
             for line in temp:
                 if not "PRIVMSG" in line:
-                    print(line)
+                    print(Fore.GREEN + ">>>" + Style.RESET_ALL , line)
+                if self.pingged == True:
+                    if line == "PONG :tmi.twitch.tv":
+                        self.pingged = False
+                        tnow = str(dt.now().strftime('%Y%m%d%H%M%S'))
+                        format = '%Y%m%d%H%M%S'
+                        delta = dt.strptime(tnow, format) - dt.strptime(self.ping_sent, format)
+                        thepingnumber = str(delta.total_seconds())
+                        tping = (time.monotonic() - self.before) * 1000
+                        sock.send((f"PRIVMSG {chan} :Twitch:{thepingnumber[:-2]}ms, Oybot:{round(float(tping))}ms\r\n").encode("utf-8"))
                 _line = str(line.encode("utf-8").decode("utf-8"))
                 if line == "PING :tmi.twitch.tv":
                     lastping = dt.now().strftime('%Y%m%d%H%M%S')
@@ -224,6 +254,7 @@ class sitinchat(Thread):
                     pri = _line.split(findprv)
                     cmds = re.split(" ", pri[1])
                     user = re.search(r"display-name=([a-zA-Z0-9-_\w]+)", _line)
+                    greetingWords = re.search(r"hey|hi|hello|sup|zaqHi|yo|hullo", pri[1].lower())
                     zaqT = re.search(r"(zaqT$)", pri[1])
                     try:
                         DPN += user.group(1)
@@ -236,42 +267,56 @@ class sitinchat(Thread):
                             DPN += "Chatter"
 
                     try:
-                        if str(cmds[0]).lower() in greetingWord or str(cmds[1]).lower() in greetingWord:
+                        if greetingWords:
                             if self.shouldSayHi(DPN):
-                                if DPN not in seen:
+                                if not DPN.lower() in seen:
                                     sock.send(("PRIVMSG {} :{} {}\r\n").format(
                                         chan, random.choice(greetings), DPN).encode("utf-8"))
-                                    seen.append(DPN)
+                                    seen.append(DPN.lower())
                                 else:
                                     print(
                                         Fore.BLUE + "[GREETING INFO] " + f"[{pringtime}]" + Style.RESET_ALL + f"I saw {DPN} today already, I won't be greeting.")
                             else:
+                                seen.append(DPN.lower())
                                 print(
                                     Fore.BLUE + "[GREETING INFO] " + f"[{pringtime}]" + Style.RESET_ALL + f"{DPN} Doesn't like when I say Hi to them. sadKEK")
-                                
-                                lastwave = dt.now().strftime('%Y%m%d%H%M%S')
+
+                        elif not DPN.lower() in seen:
+                            offset = int(random.randint(0, 5))
+                            if self.shouldSayHi(DPN):
+                                if DPN not in seen:
+                                    sleep(offset)
+                                    sock.send(("PRIVMSG {} :{} {}\r\n").format(
+                                        chan, random.choice(greetings), DPN).encode("utf-8"))
+                                    seen.append(DPN.lower())
+                                else:
+                                    print(
+                                        Fore.BLUE + "[GREETING INFO] " + f"[{pringtime}]" + Style.RESET_ALL + f"I saw {DPN} today already, I won't be greeting.")
+                            else:
+                                seen.append(DPN.lower())
+                                print(
+                                    Fore.BLUE + "[GREETING INFO] " + f"[{pringtime}]" + Style.RESET_ALL + f"{DPN} Doesn't like when I say Hi to them. from the seen sadKEK")
+
+                        lastwave = dt.now().strftime('%Y%m%d%H%M%S')
                     except IndexError:
                         pass
-
-                    if str(cmds[0]) == "!ping":
+                    self.ping(line)
+                    if str(cmds[0]) == "!blacklist" and DPN.lower() == "ringomar" or str(cmds[0]) == "!blacklist" and DPN.lower() == "oythebrave" :
+                        configFile = loadFile("config.json")
+                        configFile["blacklisthello"].append(cmds[1].lower())
+                        saveFile("config.json", configFile)
                         sock.send(("PRIVMSG {} :{}\r\n").format(
-                            chan, "Pong!").encode("utf-8"))
-                    elif str(cmds[0]) == "!blacklist" and DPN.lower() == "ringomar" or str(cmds[0]) == "!blacklist" and DPN.lower() == "oythebrave" :	
-                        configFile = loadFile("config.json")	
-                        configFile["blacklisthello"].append(cmds[1].lower())	
-                        saveFile("config.json", configFile)	
-                        sock.send(("PRIVMSG {} :{}\r\n").format(	
-                            chan, "Adding them to the LIST zaqNA").encode("utf-8"))                            
+                            chan, "Adding them to the LIST zaqNA").encode("utf-8"))
                     elif str(cmds[0]) == "!version":
                         req = requests.get("https://raw.githubusercontent.com/RingoMar/androyd/master/version.json", timeout=10).json()
                         sock.send(("PRIVMSG {} :Androyd Version: {}\r\n").format(
                             chan, req["version"]).encode("utf-8"))
-                    elif zaqT:
+                    elif zaqT  and DPN.lower() != "oythebrave":
                         if self.shouldEmote():
                             emotecool = dt.now().strftime('%Y%m%d%H%M%S')
                             sock.send(("PRIVMSG {} :{}\r\n").format(
                                 chan, "zaqT").encode("utf-8"))
-                    elif "zaqCA" in str(pri[1]) or "zaqCop" in str(pri[1]):
+                    elif "zaqCA" in str(pri[1]) and DPN.lower() != "oythebrave" or "zaqCop" in str(pri[1]) and DPN.lower() != "oythebrave":
                         if self.shouldEmote():
                             emotecool = dt.now().strftime('%Y%m%d%H%M%S')
                             sock.send(("PRIVMSG {} :{}\r\n").format(
