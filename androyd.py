@@ -161,7 +161,7 @@ class sitinchat(Thread):
         temp = buffer.split("\r\n")
         buffer = temp.pop()
         greetingWord = ["hey", "hi", "hello", "sup", "zaqHi", "yo"]
-        greetings = ["Hey", "Hi", "Hello", "Sup", "Hola", "Bonjour"
+        greetings = ["Hey", "Hi", "Hello", "Sup", "Hola", "Bonjour",
                      "zaqHi", "zaqWave", "zaqHugA", "Waddup", "Oh Hey", "DONTPETTHERACCOON Hey"]
         try:
             for line in temp:
@@ -282,7 +282,7 @@ class sitinchat(Thread):
                                     Fore.BLUE + "[GREETING INFO] " + f"[{pringtime}]" + Style.RESET_ALL + f"{DPN} Doesn't like when I say Hi to them. sadKEK")
 
                         elif not DPN.lower() in seen:
-                            offset = int(random.randint(0, 5))
+                            offset = int(random.randint(1, 5))
                             if self.shouldSayHi(DPN):
                                 if DPN not in seen:
                                     sleep(offset)
