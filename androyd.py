@@ -1,8 +1,18 @@
-#!/usr/bin/python3
-# -*- coding: utf-8 -*-
-
-import json
 import os
+try:
+    import enchant
+except ImportError:
+    os.system("pip install pyenchant")
+    import enchant
+
+try:
+    import spacy
+except ImportError:
+    os.system("pip install -U spacy")
+    os.system("python -m spacy download en_core_web_sm")
+    import spacy
+import operator
+import json
 import random
 import re
 import socket
@@ -147,6 +157,113 @@ class sitinchat(Thread):
 
         return
 
+    def seed_name(self, rname):
+        try:
+            wrdType = {"ADJ": "adjective", "ADP": "adposition", "ADV": "adverb", "AUX": "auxiliary verb",
+            "CONJ": "coordinating conjunction", "DET": "determiner", "INTJ": "interjection", "NOUN": "noun",
+            "NUM": "numeral", "PART": "particle", "PRON": "pronoun", "PROPN": "proper noun",
+            "PUNCT": "punctuation", "SCONJ": "subordinating conjunction", "SYM": "symbol",
+            "VERB": "verb","X": "other"}
+            nlp = spacy.load("en_core_web_sm")
+            wordPredict = enchant.Dict("en_US")
+            foundWords = []
+            derivedWords = []
+            suggestWords = []
+            finalWords = {}
+            tags = []
+            name = rname.replace("_", " ")
+            # If user has a capitals in name split it up 
+            r1 = re.findall(r"([A-z][a-z]+)", name)
+            try:
+                if r1[1]:
+                    for Fragname in r1:
+                        suggestWords.append(Fragname)
+            except IndexError:
+                # User doesn't have capitals now looking for other names in name
+                for namer in name:
+                    try:
+                        if wordPredict.check(derivedWords[-1]) and len(derivedWords[-1]) >= 3:
+                            foundWords.append(derivedWords[-1])
+                            del derivedWords[:]
+                        derivedWords.append(derivedWords[-1] + namer)
+                    except IndexError:
+                        derivedWords.append(namer)
+
+                for decon in derivedWords:
+                    suggestWords.append(wordPredict.suggest(decon))
+                for decon in foundWords:
+                    suggestWords.append(wordPredict.suggest(decon))
+
+
+            # Take suggested words and put into percentage cal
+            for userWord in suggestWords:
+                try:
+                    if r1[1]:
+                        try:
+                            wordper = re.search(userWord, name)
+                            types = nlp(wordper[0])
+                            divF = 100/(len(wordper[0])+len(name))
+                            finalWords[round((len(name) * divF), 2)] = [wordper[0]]
+                            for token in types:
+                                finalWords[round((len(name) * divF), 2)].append(token.text)
+                                finalWords[round((len(name) * divF), 2)].append(token.pos_)
+                                finalWords[round((len(name) * divF), 2)].append(token.lemma_)
+                                finalWords[round((len(name) * divF), 2)].append(token.tag_)
+                                finalWords[round((len(name) * divF), 2)].append(token.dep_)
+                                finalWords[round((len(name) * divF), 2)].append(token.shape_)
+                                finalWords[round((len(name) * divF), 2)].append(token.is_alpha)
+                                finalWords[round((len(name) * divF), 2)].append(token.is_stop)
+                        except TypeError:
+                            pass
+                except:
+                    for rWordRE in userWord:
+                        wordRE = rWordRE.replace("-", "")
+                        rWordRE.replace(" ", "")
+                        try:
+                            wordper = re.search(wordRE, name)
+                            types = nlp(wordper[0])
+                            divF = 100/(len(wordper[0])+len(name))
+                            finalWords[round((len(name) * divF), 2)] = [wordper[0]]
+                            for token in types:
+                                finalWords[round((len(name) * divF), 2)].append(token.text)
+                                finalWords[round((len(name) * divF), 2)].append(token.pos_)
+                                finalWords[round((len(name) * divF), 2)].append(token.lemma_)
+                                finalWords[round((len(name) * divF), 2)].append(token.tag_)
+                                finalWords[round((len(name) * divF), 2)].append(token.dep_)
+                                finalWords[round((len(name) * divF), 2)].append(token.shape_)
+                                finalWords[round((len(name) * divF), 2)].append(token.is_alpha)
+                                finalWords[round((len(name) * divF), 2)].append(token.is_stop)
+                        except TypeError:
+                            pass
+
+            sorted_dict = dict(sorted(finalWords.items(), key=operator.itemgetter(0)))
+            # print(foundWords, derivedWords, suggestWords, finalWords)
+            try:
+                if len(finalWords[next(iter(sorted_dict))]) >= 3:
+                    if int(next(iter(sorted_dict))) <= 80:
+                        nameWeWant = ""
+                        weWant = {"noun" : True, "pronoun": True, "adverb": True, "adjective": True, "proper noun": True}
+                        for namesWeHave in finalWords.keys():
+                                namesWeHAve = (wrdType[finalWords[namesWeHave][2]])
+                                try:
+                                    if weWant[namesWeHAve]:
+                                        nameWeWant = finalWords[namesWeHave][1]
+                                except KeyError:
+                                    pass
+                                
+                        if nameWeWant:
+                            return nameWeWant
+                        else:
+                            return rname
+                    else:
+                        return rname
+            except Exception as e:
+                return rname
+
+        except Exception as er:
+            return name
+
+
     def readfuntion(self):
         global lastping
         global mgft
@@ -166,7 +283,7 @@ class sitinchat(Thread):
         try:
             for line in temp:
                 if not "PRIVMSG" in line:
-                    print(Fore.GREEN + ">>>" + Style.RESET_ALL , line)
+                    print(Fore.GREEN + ">>>" + Style.RESET_ALL, line)
                 if self.pingged == True:
                     if line == "PONG :tmi.twitch.tv":
                         self.pingged = False
@@ -254,7 +371,8 @@ class sitinchat(Thread):
                     pri = _line.split(findprv)
                     cmds = re.split(" ", pri[1])
                     user = re.search(r"display-name=([a-zA-Z0-9-_\w]+)", _line)
-                    greetingWords = re.search(r"hey|hi|hello|sup|zaqHi|yo|hullo", pri[1].lower())
+                    greetingWords = re.search(
+                        r"hey|hi|hello|sup|zaqHi|yo|hullo", pri[1].lower())
                     zaqT = re.search(r"(zaqT$)", pri[1])
                     try:
                         DPN += user.group(1)
@@ -265,13 +383,12 @@ class sitinchat(Thread):
                             DPN += user.group(1)
                         except AttributeError:
                             DPN += "Chatter"
-
                     try:
                         if greetingWords:
                             if self.shouldSayHi(DPN):
                                 if not DPN.lower() in seen:
                                     sock.send(("PRIVMSG {} :{} {}\r\n").format(
-                                        chan, random.choice(greetings), DPN).encode("utf-8"))
+                                        chan, random.choice(greetings), self.seed_name(DPN)).encode("utf-8"))
                                     seen.append(DPN.lower())
                                 else:
                                     print(
@@ -282,12 +399,12 @@ class sitinchat(Thread):
                                     Fore.BLUE + "[GREETING INFO] " + f"[{pringtime}]" + Style.RESET_ALL + f"{DPN} Doesn't like when I say Hi to them. sadKEK")
 
                         elif not DPN.lower() in seen:
-                            offset = int(random.randint(1, 5))
+                            offset = int(random.randint(2, 4))
                             if self.shouldSayHi(DPN):
                                 if DPN not in seen:
                                     sleep(offset)
                                     sock.send(("PRIVMSG {} :{} {}\r\n").format(
-                                        chan, random.choice(greetings), DPN).encode("utf-8"))
+                                        chan, random.choice(greetings), self.seed_name(DPN)).encode("utf-8"))
                                     seen.append(DPN.lower())
                                 else:
                                     print(
@@ -380,11 +497,12 @@ class hearthbeat(Thread):
                 if str(hearthbeat.has_internet(self)) == "True":
                     print(Fore.RED + "[HEARTHBEAT INFO] " +
                           Style.RESET_ALL + hearthbeat.has_internet(self))
-                    os.execv(sys.executable, ['python3'] + sys.argv)
+                    os.execv(sys.executable, ['python'] + sys.argv)
             except Exception as e:
                 print(Fore.RED + "[HEARTHBEAT INFO] " +
-                      Style.RESET_ALL + hearthbeat.has_internet(self))
+                      Style.RESET_ALL, hearthbeat.has_internet(self))
                 print(Fore.RED + traceback.format_exc() + Style.RESET_ALL)
+                os.execv(sys.executable, ['python'] + sys.argv)
             tnow = str(dt.now().strftime('%Y%m%d%H%M%S'))
             format = '%Y%m%d%H%M%S'
             delta = dt.strptime(tnow, format) - dt.strptime(lastping, format)
