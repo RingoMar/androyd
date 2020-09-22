@@ -242,12 +242,13 @@ class sitinchat(Thread):
                 if len(finalWords[next(iter(sorted_dict))]) >= 3:
                     if int(next(iter(sorted_dict))) <= 80:
                         nameWeWant = ""
-                        weWant = {"noun" : True, "pronoun": True, "adverb": True, "adjective": True, "proper noun": True}
+                        weWant = {"noun" : True, "pronoun": True, "adverb": True, "adjective": True}
                         for namesWeHave in finalWords.keys():
                                 namesWeHAve = (wrdType[finalWords[namesWeHave][2]])
                                 try:
                                     if weWant[namesWeHAve]:
-                                        nameWeWant = finalWords[namesWeHave][1]
+                                        if weWant[namesWeHAve] >= 4:
+                                            nameWeWant = finalWords[namesWeHave][1]
                                 except KeyError:
                                     pass
                                 
@@ -257,11 +258,13 @@ class sitinchat(Thread):
                             return rname
                     else:
                         return rname
-            except Exception as e:
+                else:
+                    return rname
+            except:
                 return rname
 
-        except Exception as er:
-            return name
+        except:
+            return rname
 
 
     def readfuntion(self):
