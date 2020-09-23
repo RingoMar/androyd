@@ -1,16 +1,6 @@
 import os
-try:
-    import enchant
-except ImportError:
-    os.system("pip install pyenchant")
-    import enchant
-
-try:
-    import spacy
-except ImportError:
-    os.system("pip install -U spacy")
-    os.system("python -m spacy download en_core_web_sm")
-    import spacy
+import enchant
+import spacy
 import operator
 import json
 import random
@@ -119,11 +109,13 @@ class sitinchat(Thread):
         global intstart
         print(Fore.GREEN)
         print("""
-                _______ _____   __________ ________ _______ __  __________     
-                ___    |___  | / /___  __ \___  __ \__  __ \_ \/ /___  __ \    
-                __  /| |__   |/ / __  / / /__  /_/ /_  / / /__  / __  / / /    
-                _  ___ |_  /|  /  _  /_/ / _  _, _/ / /_/ / _  /  _  /_/ /     
-                /_/  |_|/_/ |_/   /_____/  /_/ |_|  \____/  /_/   /_____/ """ + Style.RESET_ALL)
+
+                ░█████╗░██╗░░░██╗██████╗░░█████╗░████████╗
+                ██╔══██╗╚██╗░██╔╝██╔══██╗██╔══██╗╚══██╔══╝
+                ██║░░██║░╚████╔╝░██████╦╝██║░░██║░░░██║░░░
+                ██║░░██║░░╚██╔╝░░██╔══██╗██║░░██║░░░██║░░░
+                ╚█████╔╝░░░██║░░░██████╦╝╚█████╔╝░░░██║░░░
+                ░╚════╝░░░░╚═╝░░░╚═════╝░░╚════╝░░░░╚═╝░░░""" + Style.RESET_ALL)
         print(Fore.GREEN + "[INFO] " + Style.RESET_ALL +
               "Trying to connect to... irc.twitch.tv:6667")
         try:
@@ -247,8 +239,7 @@ class sitinchat(Thread):
                                 namesWeHAve = (wrdType[finalWords[namesWeHave][2]])
                                 try:
                                     if weWant[namesWeHAve]:
-                                        if weWant[namesWeHAve] >= 4:
-                                            nameWeWant = finalWords[namesWeHave][1]
+                                        nameWeWant = finalWords[namesWeHave][1]
                                 except KeyError:
                                     pass
                                 
