@@ -29,7 +29,6 @@ lastping = ""
 subgifts = 0
 mgft = False
 giftcount = 0
-seen = []
 
 lastping = dt.now().strftime('%Y%m%d%H%M%S')
 lastmessage = dt.now().strftime('%Y%m%d%H%M%S')
@@ -60,6 +59,7 @@ class sitinchat(Thread):
         self.pingged = False
         self.ping_sent = ""
         self.before = ""
+        self.seen = {}
 
     def randommessage(self):
         global lastmessage
@@ -74,6 +74,7 @@ class sitinchat(Thread):
 
     def shouldSayHi(self, uName):
         global lastwave
+        pringtime = ("{:{tfmt}}".format(dt.now(), tfmt="%H:%M:%S"))
         configFile = loadFile("config.json")
         tnow = str(dt.now().strftime('%Y%m%d%H%M%S'))
         format = '%Y%m%d%H%M%S'
@@ -90,6 +91,7 @@ class sitinchat(Thread):
             else:
                 return True
         else:
+            print(Fore.BLUE + "[GREETING INFO] " + f"[{pringtime}]" + Style.RESET_ALL + "On a cooldown, I won't say hello and ignoring them.")
             return False
 
     def shouldEmote(self):
@@ -152,7 +154,7 @@ class sitinchat(Thread):
         try:
             wrdType = {"ADJ": "adjective", "ADP": "adposition", "ADV": "adverb", "AUX": "auxiliary verb",
             "CONJ": "coordinating conjunction", "DET": "determiner", "INTJ": "interjection", "NOUN": "noun",
-            "NUM": "numeral", "PART": "particle", "PRON": "pronoun", "PROPN": "proper noun",
+            "NUM": "numeral", "PART": "particle", "PRON": "pronoun", "PROPN": "propernoun",
             "PUNCT": "punctuation", "SCONJ": "subordinating conjunction", "SYM": "symbol",
             "VERB": "verb","X": "other"}
             nlp = spacy.load("en_core_web_sm")
@@ -163,6 +165,7 @@ class sitinchat(Thread):
             finalWords = {}
             tags = []
             name = rname.replace("_", " ")
+            nameWeWant = ""
             # If user has a capitals in name split it up 
             r1 = re.findall(r"([A-z][a-z]+)", name)
             try:
@@ -228,19 +231,20 @@ class sitinchat(Thread):
                             pass
 
             sorted_dict = dict(sorted(finalWords.items(), key=operator.itemgetter(0)))
-            # print(foundWords, derivedWords, suggestWords, finalWords)
+            # print(finalWords)
             try:
                 if len(finalWords[next(iter(sorted_dict))]) >= 3:
-                    if int(next(iter(sorted_dict))) <= 80:
-                        nameWeWant = ""
-                        weWant = {"noun" : True, "pronoun": True, "adverb": True, "adjective": True}
+                    print(sorted_dict.keys(), int(next(iter(sorted_dict))))
+                    vaVl = int(next(iter(sorted_dict))) 
+                    if vaVl <= 76:
+                        weWant = {"noun" : True, "pronoun": True, "adverb": True, "adjective": True, "propernoun": True}
                         for namesWeHave in finalWords.keys():
-                                namesWeHAve = (wrdType[finalWords[namesWeHave][2]])
-                                try:
-                                    if weWant[namesWeHAve]:
-                                        nameWeWant = finalWords[namesWeHave][1]
-                                except KeyError:
-                                    pass
+                            namesWeHAvep2 = (wrdType[finalWords[namesWeHave][2]])
+                            try:
+                                if weWant[namesWeHAvep2] and nameWeWant == "":
+                                    nameWeWant = finalWords[namesWeHave][1]
+                            except KeyError:
+                                pass
                                 
                         if nameWeWant:
                             return nameWeWant
@@ -263,7 +267,6 @@ class sitinchat(Thread):
         global giftcount
         global lastmessage
         global lastwave
-        global seen
         global emotecool
         pringtime = ("{:{tfmt}}".format(dt.now(), tfmt="%H:%M:%S"))
         buffer = ""
@@ -275,8 +278,10 @@ class sitinchat(Thread):
                      "zaqHi", "zaqWave", "zaqHugA", "Waddup", "Oh Hey", "DONTPETTHERACCOON Hey"]
         try:
             for line in temp:
-                if not "PRIVMSG" in line:
-                    print(Fore.GREEN + ">>>" + Style.RESET_ALL, line)
+                if line == "PING :tmi.twitch.tv":
+                    lastping = dt.now().strftime('%Y%m%d%H%M%S')
+                    sock.send("PONG :tmi.twitch.tv\r\n".encode("utf-8"))
+
                 if self.pingged == True:
                     if line == "PONG :tmi.twitch.tv":
                         self.pingged = False
@@ -284,12 +289,14 @@ class sitinchat(Thread):
                         format = '%Y%m%d%H%M%S'
                         delta = dt.strptime(tnow, format) - dt.strptime(self.ping_sent, format)
                         thepingnumber = str(delta.total_seconds())
-                        tping = (time.monotonic() - self.before) * 1000
+                        tping = (time.monotonic() - self.before) * 100
                         sock.send((f"PRIVMSG {chan} :Twitch:{thepingnumber[:-2]}ms, Oybot:{round(float(tping))}ms\r\n").encode("utf-8"))
+                self.ping(line)
+
+                if not "PRIVMSG" in line:
+                    print(Fore.GREEN + ">>>" + Style.RESET_ALL, line)
+
                 _line = str(line.encode("utf-8").decode("utf-8"))
-                if line == "PING :tmi.twitch.tv":
-                    lastping = dt.now().strftime('%Y%m%d%H%M%S')
-                    sock.send("PONG :tmi.twitch.tv\r\n".encode("utf-8"))
                 if str("tmi.twitch.tv USERNOTICE ") in _line:
                     messagetype = re.search(r"msg-id=([a-zA-Z]+)", _line)
                     submsgmsg = "zaqHeart " * int(random.randint(30, 38))
@@ -344,6 +351,7 @@ class sitinchat(Thread):
 
                     except Exception as e:
                         pass
+
                 if (self.randommessage()):
                     offset = int(random.randint(0, 60))
                     print(Fore.BLUE + "[RANDOM MESSAGE INFO]" + Style.RESET_ALL +
@@ -377,63 +385,60 @@ class sitinchat(Thread):
                         except AttributeError:
                             DPN += "Chatter"
                     try:
+                        greetName = DPN.lower()
                         if greetingWords:
-                            if self.shouldSayHi(DPN):
-                                if not DPN.lower() in seen:
-                                    sock.send(("PRIVMSG {} :{} {}\r\n").format(
-                                        chan, random.choice(greetings), self.seed_name(DPN)).encode("utf-8"))
-                                    seen.append(DPN.lower())
+                            if self.shouldSayHi(greetName):
+                                if greetName not in self.seen.keys():
+                                    sock.send(("PRIVMSG {} :{} {}\r\n").format(chan, random.choice(greetings), self.seed_name(DPN)).encode("utf-8"))
+                                    self.seen[greetName] = True
+                                    lastwave = dt.now().strftime('%Y%m%d%H%M%S')
                                 else:
-                                    print(
-                                        Fore.BLUE + "[GREETING INFO] " + f"[{pringtime}]" + Style.RESET_ALL + f"I saw {DPN} today already, I won't be greeting.")
+                                    print(Fore.BLUE + "[GREETING INFO] " + f"[{pringtime}]" + Style.RESET_ALL + f"I saw {DPN} today already, I won't be greeting.")
                             else:
-                                seen.append(DPN.lower())
-                                print(
-                                    Fore.BLUE + "[GREETING INFO] " + f"[{pringtime}]" + Style.RESET_ALL + f"{DPN} Doesn't like when I say Hi to them. sadKEK")
+                                self.seen[greetName] = True
+                                print(Fore.BLUE + "[GREETING INFO] " + f"[{pringtime}]" + Style.RESET_ALL + f"{DPN} Doesn't like when I say Hi to them. sadKEK")
 
-                        elif not DPN.lower() in seen:
-                            offset = int(random.randint(2, 4))
-                            if self.shouldSayHi(DPN):
-                                if DPN not in seen:
-                                    sleep(offset)
-                                    sock.send(("PRIVMSG {} :{} {}\r\n").format(
-                                        chan, random.choice(greetings), self.seed_name(DPN)).encode("utf-8"))
-                                    seen.append(DPN.lower())
+                        elif greetName not in self.seen.keys():
+                            if self.shouldSayHi(greetName):
+                                if greetName not in self.seen.keys():
+                                    sock.send(("PRIVMSG {} :{} {}\r\n").format(chan, random.choice(greetings), self.seed_name(DPN)).encode("utf-8"))
+                                    self.seen[greetName] = True
+                                    lastwave = dt.now().strftime('%Y%m%d%H%M%S')
                                 else:
-                                    print(
-                                        Fore.BLUE + "[GREETING INFO] " + f"[{pringtime}]" + Style.RESET_ALL + f"I saw {DPN} today already, I won't be greeting.")
+                                    print(Fore.BLUE + "[GREETING INFO] " + f"[{pringtime}]" + Style.RESET_ALL + f"I saw {DPN} today already, I won't be greeting.")
                             else:
-                                seen.append(DPN.lower())
-                                print(
-                                    Fore.BLUE + "[GREETING INFO] " + f"[{pringtime}]" + Style.RESET_ALL + f"{DPN} Doesn't like when I say Hi to them. from the seen sadKEK")
-
-                        lastwave = dt.now().strftime('%Y%m%d%H%M%S')
+                                self.seen[greetName] = True
+                                print(Fore.BLUE + "[GREETING INFO] " + f"[{pringtime}]" + Style.RESET_ALL + f"{DPN} Doesn't like when I say Hi to them. from the seen sadKEK")
                     except IndexError:
                         pass
-                    self.ping(line)
+                        
                     if str(cmds[0]) == "!blacklist" and DPN.lower() == "ringomar" or str(cmds[0]) == "!blacklist" and DPN.lower() == "oythebrave" :
                         configFile = loadFile("config.json")
                         configFile["blacklisthello"].append(cmds[1].lower())
                         saveFile("config.json", configFile)
                         sock.send(("PRIVMSG {} :{}\r\n").format(
                             chan, "Adding them to the LIST zaqNA").encode("utf-8"))
-                    elif str(cmds[0]) == "!version":
+
+                    elif str(cmds[0]) == "!v":
+                        configFile = loadFile("version.json")
                         req = requests.get("https://raw.githubusercontent.com/RingoMar/androyd/master/version.json", timeout=10).json()
-                        sock.send(("PRIVMSG {} :Androyd Version: {}\r\n").format(
-                            chan, req["version"]).encode("utf-8"))
-                    elif zaqT  and DPN.lower() != "oythebrave":
+                        if req["version"] > configFile["version"]:
+                            sock.send(("PRIVMSG {} :[Outdated] Cloud: {}, Local: {}\r\n").format(chan, req["version"], configFile["version"]).encode("utf-8"))
+                        else:
+                            sock.send(("PRIVMSG {} :[Updated] Cloud: {}, Local: {}\r\n").format(chan, req["version"], configFile["version"]).encode("utf-8"))
+
+                    elif zaqT and DPN.lower() != "oythebrave":
                         if self.shouldEmote():
                             emotecool = dt.now().strftime('%Y%m%d%H%M%S')
-                            sock.send(("PRIVMSG {} :{}\r\n").format(
-                                chan, "zaqT").encode("utf-8"))
+                            sock.send(("PRIVMSG {} :{}\r\n").format(chan, "zaqT").encode("utf-8"))
+
                     elif "zaqCA" in str(pri[1]) and DPN.lower() != "oythebrave" or "zaqCop" in str(pri[1]) and DPN.lower() != "oythebrave":
                         if self.shouldEmote():
                             emotecool = dt.now().strftime('%Y%m%d%H%M%S')
-                            sock.send(("PRIVMSG {} :{}\r\n").format(
-                                chan, "zaqCA").encode("utf-8"))
+                            sock.send(("PRIVMSG {} :{}\r\n").format(chan, "zaqCA").encode("utf-8"))
+
                     elif DPN == "RichardHarrow_" and "1v1" in str(pri[1]):
-                            sock.send(("PRIVMSG {} :{}\r\n").format(
-                                chan, "!roll").encode("utf-8"))
+                            sock.send(("PRIVMSG {} :{}\r\n").format(chan, "!roll").encode("utf-8"))
 
                     # ErrorData.error(e)
                     # ErrorData.info('"{}"'.format(_line))
