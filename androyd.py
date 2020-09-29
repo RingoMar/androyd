@@ -166,6 +166,25 @@ class sitinchat(Thread):
             tags = []
             name = rname.replace("_", " ")
             nameWeWant = ""
+
+            revName = name[::-1]
+            token1 = []
+            token2 = []
+            for t1 in name:
+                try:
+                    token1.append(token1[-1] + t1)
+                except IndexError:
+                    token1.append(t1)
+
+            for t2 in revName:
+                try:
+                    token2.append(token2[-1] + t2)
+                except IndexError:
+                    token2.append(t2)
+            
+            for rev in token2:
+                token1.append(rev[::-1])
+
             # If user has a capitals in name split it up 
             r1 = re.findall(r"([A-z][a-z]+)", name)
             try:
@@ -174,12 +193,12 @@ class sitinchat(Thread):
                         suggestWords.append(Fragname)
             except IndexError:
                 # User doesn't have capitals now looking for other names in name
-                for namer in name:
+                for namer in token1:
                     try:
                         if wordPredict.check(derivedWords[-1]) and len(derivedWords[-1]) >= 3:
                             foundWords.append(derivedWords[-1])
                             del derivedWords[:]
-                        derivedWords.append(derivedWords[-1] + namer)
+                        derivedWords.append(namer)
                     except IndexError:
                         derivedWords.append(namer)
 
@@ -231,22 +250,21 @@ class sitinchat(Thread):
                             pass
 
             sorted_dict = dict(sorted(finalWords.items(), key=operator.itemgetter(0)))
-            # print(finalWords)
+            print(sorted_dict)
             try:
                 if len(finalWords[next(iter(sorted_dict))]) >= 3:
-                    print(sorted_dict.keys(), int(next(iter(sorted_dict))))
                     vaVl = int(next(iter(sorted_dict))) 
                     if vaVl <= 76:
                         weWant = {"noun" : True, "pronoun": True, "adverb": True, "adjective": True, "propernoun": True}
-                        for namesWeHave in finalWords.keys():
+                        for namesWeHave in sorted_dict.keys():
                             namesWeHAvep2 = (wrdType[finalWords[namesWeHave][2]])
                             try:
-                                if weWant[namesWeHAvep2] and nameWeWant == "":
+                                if weWant[namesWeHAvep2] and nameWeWant == "" and len(finalWords[namesWeHave][1]) >= 3 and namesWeHAvep2 != "bycake":
                                     nameWeWant = finalWords[namesWeHave][1]
                             except KeyError:
                                 pass
                                 
-                        if nameWeWant:
+                        if nameWeWant and len(nameWeWant) >= 4:
                             return nameWeWant
                         else:
                             return rname
@@ -257,7 +275,7 @@ class sitinchat(Thread):
             except:
                 return rname
 
-        except:
+        except Exception as e:
             return rname
 
 
