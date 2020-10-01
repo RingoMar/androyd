@@ -50,6 +50,17 @@ def saveFile(infile, data):
         outfile.close()
     return
 
+startText = """
+:'#######::'##:::'##:'########:::'#######::'########:
+'##.... ##:. ##:'##:: ##.... ##:'##.... ##:... ##..::
+ ##:::: ##::. ####::: ##:::: ##: ##:::: ##:::: ##::::
+ ##:::: ##:::. ##:::: ########:: ##:::: ##:::: ##::::
+ ##:::: ##:::: ##:::: ##.... ##: ##:::: ##:::: ##::::
+ ##:::: ##:::: ##:::: ##:::: ##: ##:::: ##:::: ##::::
+. #######::::: ##:::: ########::. #######::::: ##::::
+:.......::::::..:::::........::::.......::::::..:::::
+                                        by @_ringomar
+"""
 
 class sitinchat(Thread):
     def __init__(self):
@@ -60,6 +71,18 @@ class sitinchat(Thread):
         self.ping_sent = ""
         self.before = ""
         self.seen = {}
+
+    def cache_viewer(self):
+        try:
+            if sys.argv[1] == "cache_wave":
+                viewlist = requests.get('https://tmi.twitch.tv/group/user/zaquelle/chatters', timeout=10).json()
+                outterChatters = viewlist["chatters"]
+                for vkey in outterChatters.keys():
+                    vinner =  outterChatters[vkey]
+                    for innviewer in vinner:
+                        self.seen[innviewer] = True
+        except: 
+            pass
 
     def randommessage(self):
         global lastmessage
@@ -109,17 +132,11 @@ class sitinchat(Thread):
 
     def connectsock(self):
         global intstart
-        print(Fore.GREEN)
-        print("""
-.  (   ( (   ( .    (   
- . )\  )\)\ ())  (  )\  
-  ((_)((_)_)_)() )\((_) 
- / _ \| || | _ )((_) |_ 
-| (_) |\_. | _ \ _ \  _|
- \___/ |__/|___/___/\__|""" + Style.RESET_ALL)
+        print(Fore.GREEN + startText + Style.RESET_ALL)
         print(Fore.GREEN + "[INFO] " + Style.RESET_ALL +
               "Trying to connect to... irc.twitch.tv:6667")
         try:
+            self.cache_viewer()
             sock.connect((HOST, PORT))
             sock.send(f"PASS {OAuth}\r\n".encode("utf-8"))
             sock.send(f"NICK {botname}\r\n".encode("utf-8"))
@@ -513,18 +530,18 @@ class hearthbeat(Thread):
                 if str(hearthbeat.has_internet(self)) == "True":
                     print(Fore.RED + "[HEARTHBEAT INFO] " +
                           Style.RESET_ALL + hearthbeat.has_internet(self))
-                    os.execv(sys.executable, ['python'] + sys.argv)
+                    os.execv(sys.executable, ['py'] + ["androyd.py", "cache_wave"])
             except Exception as e:
                 print(Fore.RED + "[HEARTHBEAT INFO] " +
                       Style.RESET_ALL, hearthbeat.has_internet(self))
                 print(Fore.RED + traceback.format_exc() + Style.RESET_ALL)
-                os.execv(sys.executable, ['python'] + sys.argv)
+                os.execv(sys.executable, ['py'] + ["androyd.py", "cache_wave"])
             tnow = str(dt.now().strftime('%Y%m%d%H%M%S'))
             format = '%Y%m%d%H%M%S'
             delta = dt.strptime(tnow, format) - dt.strptime(lastping, format)
             if int(delta.total_seconds()) > 600.0:
                 if str(hearthbeat.has_internet(self)) == "True":
-                    os.execv(sys.executable, ['python3'] + sys.argv)
+                    os.execv(sys.executable, ['py'] + ["androyd.py", "cache_wave"])
         return
 
 
