@@ -2,3 +2,7 @@ pyenchant
 spacy
 requests
 colorama
+tensorflow
+keras
+nltk
+pandas
