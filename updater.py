@@ -12,7 +12,7 @@ clear = lambda: os.system('clear')
 print(Fore.GREEN)
 clear() #for dev remove that shit before distrabuting 
 
-oybotpy = "https://raw.githubusercontent.com/RingoMar/androyd/master/androyd.py"
+oybotpy = "https://raw.githubusercontent.com/RingoMar/androyd/master/oybot.py"
 verson = "https://raw.githubusercontent.com/RingoMar/androyd/master/version.json"
 reqf = "https://raw.githubusercontent.com/RingoMar/androyd/master/requirements.text"
 updaterf = "https://raw.githubusercontent.com/RingoMar/androyd/master/updater.py"
