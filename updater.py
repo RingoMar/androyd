@@ -1,3 +1,4 @@
+# 1.0
 import json
 import os
 import sys
@@ -14,6 +15,7 @@ clear() #for dev remove that shit before distrabuting
 oybotpy = "https://raw.githubusercontent.com/RingoMar/androyd/master/androyd.py"
 verson = "https://raw.githubusercontent.com/RingoMar/androyd/master/version.json"
 reqf = "https://raw.githubusercontent.com/RingoMar/androyd/master/requirements.text"
+updaterf = "https://raw.githubusercontent.com/RingoMar/androyd/master/updater.py"
 intro = """
 :::::::::::::::>>>>>>>>>>>>>>>>>>::::::::::::::::::::
 .....................................................
@@ -209,9 +211,28 @@ class update ():
         return choice in yes
 
     def run(self):
+        should_run = False
         clear()
+
+        up_ver = requests.get(updaterf, timeout=10).text
+        cl_ver = up_ver.split("\n")
+        cloud_ver = int(cl_ver[0].replace("#", "").replace(" ", ""))
+
+        localUpdater = open("updater.py", "r")
+        first_line = localUpdater.readlines()[0]
+        local_ver = int(first_line.replace("#", "").replace(" ", ""))
+
+
+        if cloud_ver > local_ver:
+            self.saveFileF("updater.py", up_ver)
+            print("»»»» A new update to updater has been installed, please restart.")
+        else:
+            print("»»»» Updater is up to date.")
+            should_run = True
+
+        localUpdater.close()
         
-        while True:
+        while should_run:
             print(intro + "\n")
             print("[0]Update Oybot\n[1]Full Update\n[2]Clean pycache\n[3]Reset Configs\n[4]Quit")
             choice = choice = input("<Updater>: ").lower().strip()
