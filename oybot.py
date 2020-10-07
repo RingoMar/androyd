@@ -41,8 +41,8 @@ def loadFile(name):
         data = json.load(json_file)
     return data
 
-cid = loadFile("creds.json")["cid"]
-OAuth = loadFile("creds.json")["OAuth"]
+cid = loadFile("creds2.json")["cid"]
+OAuth = loadFile("creds2.json")["OAuth"]
 
 def saveFile(infile, data):
     with open(infile, 'w') as outfile:
@@ -51,6 +51,8 @@ def saveFile(infile, data):
     return
 
 startText = """
+:::::::::::::::>>>>>>>>>>>>>>>>>>::::::::::::::::::::
+.....................................................
 :'#######::'##:::'##:'########:::'#######::'########:
 '##.... ##:. ##:'##:: ##.... ##:'##.... ##:... ##..::
  ##:::: ##::. ####::: ##:::: ##: ##:::: ##:::: ##::::
@@ -59,7 +61,8 @@ startText = """
  ##:::: ##:::: ##:::: ##:::: ##: ##:::: ##:::: ##::::
 . #######::::: ##:::: ########::. #######::::: ##::::
 :.......::::::..:::::........::::.......::::::..:::::
-                                        by @_ringomar
+...<<<<<<<<<<...........................by @_ringomar
+:::::::::::........:::::::...........::::::::::::::::
 """
 
 class sitinchat(Thread):
@@ -70,6 +73,7 @@ class sitinchat(Thread):
         self.pingged = False
         self.ping_sent = ""
         self.before = ""
+        self.lastHello = {"name":"", "nickname":""}
         self.seen = {}
 
     def cache_viewer(self):
@@ -168,132 +172,137 @@ class sitinchat(Thread):
         return
 
     def seed_name(self, rname):
+        overRisdename = loadFile("fragmentnames.json")
         try:
-            wrdType = {"ADJ": "adjective", "ADP": "adposition", "ADV": "adverb", "AUX": "auxiliary verb",
-            "CONJ": "coordinating conjunction", "DET": "determiner", "INTJ": "interjection", "NOUN": "noun",
-            "NUM": "numeral", "PART": "particle", "PRON": "pronoun", "PROPN": "propernoun",
-            "PUNCT": "punctuation", "SCONJ": "subordinating conjunction", "SYM": "symbol",
-            "VERB": "verb","X": "other"}
-            nlp = spacy.load("en_core_web_sm")
-            wordPredict = enchant.Dict("en_US")
-            foundWords = []
-            derivedWords = []
-            suggestWords = []
-            finalWords = {}
-            tags = []
-            name = rname.replace("_", " ")
-            nameWeWant = ""
-
-            revName = name[::-1]
-            token1 = []
-            token2 = []
-            for t1 in name:
-                try:
-                    token1.append(token1[-1] + t1)
-                except IndexError:
-                    token1.append(t1)
-
-            for t2 in revName:
-                try:
-                    token2.append(token2[-1] + t2)
-                except IndexError:
-                    token2.append(t2)
-            
-            for rev in token2:
-                token1.append(rev[::-1])
-
-            # If user has a capitals in name split it up 
-            r1 = re.findall(r"([A-z][a-z]+)", name)
+            corrected = overRisdename[rname.lower()]
+            return corrected
+        except Exception as e:
             try:
-                if r1[1]:
-                    for Fragname in r1:
-                        suggestWords.append(Fragname)
-            except IndexError:
-                # User doesn't have capitals now looking for other names in name
-                for namer in token1:
+                wrdType = {"ADJ": "adjective", "ADP": "adposition", "ADV": "adverb", "AUX": "auxiliary verb",
+                "CONJ": "coordinating conjunction", "DET": "determiner", "INTJ": "interjection", "NOUN": "noun",
+                "NUM": "numeral", "PART": "particle", "PRON": "pronoun", "PROPN": "propernoun",
+                "PUNCT": "punctuation", "SCONJ": "subordinating conjunction", "SYM": "symbol",
+                "VERB": "verb","X": "other"}
+                nlp = spacy.load("en_core_web_sm")
+                wordPredict = enchant.Dict("en_US")
+                foundWords = []
+                derivedWords = []
+                suggestWords = []
+                finalWords = {}
+                tags = []
+                name = rname.replace("_", " ")
+                nameWeWant = ""
+
+                revName = name[::-1]
+                token1 = []
+                token2 = []
+                for t1 in name:
                     try:
-                        if wordPredict.check(derivedWords[-1]) and len(derivedWords[-1]) >= 3:
-                            foundWords.append(derivedWords[-1])
-                            del derivedWords[:]
-                        derivedWords.append(namer)
+                        token1.append(token1[-1] + t1)
                     except IndexError:
-                        derivedWords.append(namer)
+                        token1.append(t1)
 
-                for decon in derivedWords:
-                    suggestWords.append(wordPredict.suggest(decon))
-                for decon in foundWords:
-                    suggestWords.append(wordPredict.suggest(decon))
+                for t2 in revName:
+                    try:
+                        token2.append(token2[-1] + t2)
+                    except IndexError:
+                        token2.append(t2)
+                
+                for rev in token2:
+                    token1.append(rev[::-1])
 
-
-            # Take suggested words and put into percentage cal
-            for userWord in suggestWords:
+                # If user has a capitals in name split it up 
+                r1 = re.findall(r"([A-z][a-z]+)", name)
                 try:
                     if r1[1]:
+                        for Fragname in r1:
+                            suggestWords.append(Fragname)
+                except IndexError:
+                    # User doesn't have capitals now looking for other names in name
+                    for namer in token1:
                         try:
-                            wordper = re.search(userWord, name)
-                            types = nlp(wordper[0])
-                            divF = 100/(len(wordper[0])+len(name))
-                            finalWords[round((len(name) * divF), 2)] = [wordper[0]]
-                            for token in types:
-                                finalWords[round((len(name) * divF), 2)].append(token.text)
-                                finalWords[round((len(name) * divF), 2)].append(token.pos_)
-                                finalWords[round((len(name) * divF), 2)].append(token.lemma_)
-                                finalWords[round((len(name) * divF), 2)].append(token.tag_)
-                                finalWords[round((len(name) * divF), 2)].append(token.dep_)
-                                finalWords[round((len(name) * divF), 2)].append(token.shape_)
-                                finalWords[round((len(name) * divF), 2)].append(token.is_alpha)
-                                finalWords[round((len(name) * divF), 2)].append(token.is_stop)
-                        except TypeError:
-                            pass
-                except:
-                    for rWordRE in userWord:
-                        wordRE = rWordRE.replace("-", "")
-                        rWordRE.replace(" ", "")
-                        try:
-                            wordper = re.search(wordRE, name)
-                            types = nlp(wordper[0])
-                            divF = 100/(len(wordper[0])+len(name))
-                            finalWords[round((len(name) * divF), 2)] = [wordper[0]]
-                            for token in types:
-                                finalWords[round((len(name) * divF), 2)].append(token.text)
-                                finalWords[round((len(name) * divF), 2)].append(token.pos_)
-                                finalWords[round((len(name) * divF), 2)].append(token.lemma_)
-                                finalWords[round((len(name) * divF), 2)].append(token.tag_)
-                                finalWords[round((len(name) * divF), 2)].append(token.dep_)
-                                finalWords[round((len(name) * divF), 2)].append(token.shape_)
-                                finalWords[round((len(name) * divF), 2)].append(token.is_alpha)
-                                finalWords[round((len(name) * divF), 2)].append(token.is_stop)
-                        except TypeError:
-                            pass
+                            if wordPredict.check(derivedWords[-1]) and len(derivedWords[-1]) >= 3:
+                                foundWords.append(derivedWords[-1])
+                                del derivedWords[:]
+                            derivedWords.append(namer)
+                        except IndexError:
+                            derivedWords.append(namer)
 
-            sorted_dict = dict(sorted(finalWords.items(), key=operator.itemgetter(0)))
-            print(sorted_dict)
-            try:
-                if len(finalWords[next(iter(sorted_dict))]) >= 3:
-                    vaVl = int(next(iter(sorted_dict))) 
-                    if vaVl <= 76:
-                        weWant = {"noun" : True, "pronoun": True, "adverb": True, "adjective": True, "propernoun": True}
-                        for namesWeHave in sorted_dict.keys():
-                            namesWeHAvep2 = (wrdType[finalWords[namesWeHave][2]])
+                    for decon in derivedWords:
+                        suggestWords.append(wordPredict.suggest(decon))
+                    for decon in foundWords:
+                        suggestWords.append(wordPredict.suggest(decon))
+
+
+                # Take suggested words and put into percentage cal
+                for userWord in suggestWords:
+                    try:
+                        if r1[1]:
                             try:
-                                if weWant[namesWeHAvep2] and nameWeWant == "" and len(finalWords[namesWeHave][1]) >= 3 and namesWeHAvep2 != "bycake":
-                                    nameWeWant = finalWords[namesWeHave][1]
-                            except KeyError:
+                                wordper = re.search(userWord, name)
+                                types = nlp(wordper[0])
+                                divF = 100/(len(wordper[0])+len(name))
+                                finalWords[round((len(name) * divF), 2)] = [wordper[0]]
+                                for token in types:
+                                    finalWords[round((len(name) * divF), 2)].append(token.text)
+                                    finalWords[round((len(name) * divF), 2)].append(token.pos_)
+                                    finalWords[round((len(name) * divF), 2)].append(token.lemma_)
+                                    finalWords[round((len(name) * divF), 2)].append(token.tag_)
+                                    finalWords[round((len(name) * divF), 2)].append(token.dep_)
+                                    finalWords[round((len(name) * divF), 2)].append(token.shape_)
+                                    finalWords[round((len(name) * divF), 2)].append(token.is_alpha)
+                                    finalWords[round((len(name) * divF), 2)].append(token.is_stop)
+                            except TypeError:
                                 pass
-                                
-                        if nameWeWant and len(nameWeWant) >= 4:
-                            return nameWeWant
+                    except:
+                        for rWordRE in userWord:
+                            wordRE = rWordRE.replace("-", "")
+                            rWordRE.replace(" ", "")
+                            try:
+                                wordper = re.search(wordRE, name)
+                                types = nlp(wordper[0])
+                                divF = 100/(len(wordper[0])+len(name))
+                                finalWords[round((len(name) * divF), 2)] = [wordper[0]]
+                                for token in types:
+                                    finalWords[round((len(name) * divF), 2)].append(token.text)
+                                    finalWords[round((len(name) * divF), 2)].append(token.pos_)
+                                    finalWords[round((len(name) * divF), 2)].append(token.lemma_)
+                                    finalWords[round((len(name) * divF), 2)].append(token.tag_)
+                                    finalWords[round((len(name) * divF), 2)].append(token.dep_)
+                                    finalWords[round((len(name) * divF), 2)].append(token.shape_)
+                                    finalWords[round((len(name) * divF), 2)].append(token.is_alpha)
+                                    finalWords[round((len(name) * divF), 2)].append(token.is_stop)
+                            except TypeError:
+                                pass
+
+                sorted_dict = dict(sorted(finalWords.items(), key=operator.itemgetter(0)))
+                print(sorted_dict)
+                try:
+                    if len(finalWords[next(iter(sorted_dict))]) >= 3:
+                        vaVl = int(next(iter(sorted_dict))) 
+                        if vaVl <= 76:
+                            weWant = {"noun" : True, "pronoun": True, "adverb": True, "adjective": True, "propernoun": True}
+                            for namesWeHave in sorted_dict.keys():
+                                namesWeHAvep2 = (wrdType[finalWords[namesWeHave][2]])
+                                try:
+                                    if weWant[namesWeHAvep2] and nameWeWant == "" and len(finalWords[namesWeHave][1]) >= 3 and namesWeHAvep2 != "bycake":
+                                        nameWeWant = finalWords[namesWeHave][1]
+                                except KeyError:
+                                    pass
+                                    
+                            if nameWeWant and len(nameWeWant) >= 4:
+                                return nameWeWant
+                            else:
+                                return rname
                         else:
                             return rname
                     else:
                         return rname
-                else:
+                except:
                     return rname
-            except:
-                return rname
 
-        except Exception as e:
-            return rname
+            except Exception as e:
+                return rname
 
 
     def readfuntion(self):
@@ -310,7 +319,7 @@ class sitinchat(Thread):
         buffer = temp.pop()
         greetingWord = ["hey", "hi", "hello", "sup", "zaqHi", "yo"]
         greetings = ["Hey", "Hi", "Hello", "Sup", "Hola", "Bonjour",
-                     "zaqHi", "zaqWave", "zaqHugA", "Waddup", "Oh Hey", "DONTPETTHERACCOON Hey"]
+                     "zaqHi", "zaqWave", "zaqHugA", "Waddup", "Oh Hey"]
         try:
             for line in temp:
                 if line == "PING :tmi.twitch.tv":
@@ -421,11 +430,13 @@ class sitinchat(Thread):
                             DPN += "Chatter"
                     try:
                         greetName = DPN.lower()
+                        self.lastHello["name"] = greetName
                         if greetingWords:
                             if self.shouldSayHi(greetName):
                                 if greetName not in self.seen.keys():
                                     sock.send(("PRIVMSG {} :{} {}\r\n").format(chan, random.choice(greetings), self.seed_name(DPN)).encode("utf-8"))
                                     self.seen[greetName] = True
+                                    self.lastHello["nickname"] = self.seed_name(DPN)
                                     lastwave = dt.now().strftime('%Y%m%d%H%M%S')
                                 else:
                                     print(Fore.BLUE + "[GREETING INFO] " + f"[{pringtime}]" + Style.RESET_ALL + f"I saw {DPN} today already, I won't be greeting.")
@@ -438,6 +449,7 @@ class sitinchat(Thread):
                                 if greetName not in self.seen.keys():
                                     sock.send(("PRIVMSG {} :{} {}\r\n").format(chan, random.choice(greetings), self.seed_name(DPN)).encode("utf-8"))
                                     self.seen[greetName] = True
+                                    self.lastHello["nickname"] = self.seed_name(DPN)
                                     lastwave = dt.now().strftime('%Y%m%d%H%M%S')
                                 else:
                                     print(Fore.BLUE + "[GREETING INFO] " + f"[{pringtime}]" + Style.RESET_ALL + f"I saw {DPN} today already, I won't be greeting.")
@@ -453,6 +465,19 @@ class sitinchat(Thread):
                         saveFile("config.json", configFile)
                         sock.send(("PRIVMSG {} :{}\r\n").format(
                             chan, "Adding them to the LIST zaqNA").encode("utf-8"))
+
+                    elif str(cmds[0]) == "!lastname" and DPN.lower() == "ringomar" or str(cmds[0]) == "!lastname" and DPN.lower() == "oythebrave":
+                        oldData = loadFile("fragmentnames.json")
+                        oldData[self.lastHello["name"]] = cmds[1]
+                        saveFile("fragmentnames.json", oldData)
+                        print(Fore.RED + Back.WHITE + f"[{pringtime}] Adding New NickName for {DPN}")
+
+                    elif str(cmds[0]) == "!name" and DPN.lower() == "ringomar" or str(cmds[0]) == "!name" and DPN.lower() == "oythebrave":
+                        oldData = loadFile("fragmentnames.json")
+                        uNameF =  cmds[2]
+                        oldData[uNameF.lower()] = cmds[1]
+                        saveFile("fragmentnames.json", oldData)
+                        print(Fore.RED + Back.WHITE + f"[{pringtime}] Adding New NickName for {DPN}")
 
                     elif str(cmds[0]) == "!v":
                         configFile = loadFile("version.json")
@@ -530,18 +555,18 @@ class hearthbeat(Thread):
                 if str(hearthbeat.has_internet(self)) == "True":
                     print(Fore.RED + "[HEARTHBEAT INFO] " +
                           Style.RESET_ALL + hearthbeat.has_internet(self))
-                    os.execv(sys.executable, ['py'] + ["androyd.py", "cache_wave"])
+                    os.execv(sys.executable, ['py'] + ["oybot.py", "cache_wave"])
             except Exception as e:
                 print(Fore.RED + "[HEARTHBEAT INFO] " +
                       Style.RESET_ALL, hearthbeat.has_internet(self))
                 print(Fore.RED + traceback.format_exc() + Style.RESET_ALL)
-                os.execv(sys.executable, ['py'] + ["androyd.py", "cache_wave"])
+                os.execv(sys.executable, ['py'] + ["oybot.py", "cache_wave"])
             tnow = str(dt.now().strftime('%Y%m%d%H%M%S'))
             format = '%Y%m%d%H%M%S'
             delta = dt.strptime(tnow, format) - dt.strptime(lastping, format)
             if int(delta.total_seconds()) > 600.0:
                 if str(hearthbeat.has_internet(self)) == "True":
-                    os.execv(sys.executable, ['py'] + ["androyd.py", "cache_wave"])
+                    os.execv(sys.executable, ['py'] + ["oybot.py", "cache_wave"])
         return
 
 
