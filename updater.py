@@ -216,11 +216,11 @@ class update ():
 
         up_ver = requests.get(updaterf, timeout=10).text
         cl_ver = up_ver.split("\n")
-        cloud_ver = int(cl_ver[0].replace("#", "").replace(" ", ""))
+        cloud_ver = float(cl_ver[0].replace("#", "").replace(" ", ""))
 
         localUpdater = open("updater.py", "r")
         first_line = localUpdater.readlines()[0]
-        local_ver = int(first_line.replace("#", "").replace(" ", ""))
+        local_ver = float(first_line.replace("#", "").replace(" ", ""))
 
 
         if cloud_ver > local_ver:
