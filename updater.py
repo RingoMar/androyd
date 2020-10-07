@@ -107,13 +107,13 @@ class update ():
         verFile = os.path.isfile("version.json")
         if verFile:
             if req["version"] > self.loadFile("version.json")["version"]:
-                print(f"»»»» Oybot {req['version']} is ready for install...")
+                print(f"//> Oybot {req['version']} is ready for install...")
                 saveFile("version.json", req)
                 versionReturn = True
             else:
                 versionReturn = False
         else:
-            print('»»»» 404 "version.json" not found\nDownloading update anyway.')
+            print('//> 404 "version.json" not found\nDownloading update anyway.')
             saveFile("version.json", req)
             versionReturn = True
         return versionReturn
@@ -128,7 +128,7 @@ class update ():
 
         for filename, value in files.items():
             if not os.path.isfile("{}".format(filename)):
-                print("»»»» Creating empty {}".format(filename))
+                print("//> Creating empty {}".format(filename))
                 self.saveFile("{}".format(filename), value)
 
     def clearFiles(self):
@@ -140,7 +140,7 @@ class update ():
         }
 
         for filename, value in files.items():
-            print("»»»» Cleaning File {}".format(filename))
+            print("//> Cleaning File {}".format(filename))
             self.saveFile("{}".format(filename), value)
 
     def updateLite(self):
@@ -148,17 +148,17 @@ class update ():
         verFile = os.path.isfile("androyd.py") 
         mainFile = os.path.isfile("oybot.py") 
         if verFile:
-            print("»»»» Removing old file")
+            print("//> Removing old file")
             os.remove("androyd.py") 
         if mainFile:
-            print("»»»» Starting update check")
+            print("//> Starting update check")
             if self.versionCheck():
                 self.saveFileF("oybot.py", req.text)
-                print("»»»» Starting to Updating 'oybot.py'")
+                print("//> Starting to Updating 'oybot.py'")
             else:
-                print("»»»» Oybot is already up to date.")
+                print("//> Oybot is already up to date.")
         else:
-            print("»»»» Creating new 'Oybot.py' and writng data to file.")
+            print("//> Creating new 'Oybot.py' and writng data to file.")
             self.saveFileF("oybot.py", req.text)
 
     def update(self):
@@ -167,7 +167,7 @@ class update ():
         if requir:
             os.system('pip install -r requirements.text')
         else:
-            print("»»»» No requirements file; Downloading from the cloud")
+            print("//> No requirements file; Downloading from the cloud")
             self.saveFileF("requirements.text", reqc.text)
             os.system('pip install -r requirements.text')
 
@@ -176,7 +176,7 @@ class update ():
         except Exception as e:
             print("Failed making fast start scripts: {}\n".format(e))
 
-        print("»»»» Checking local config files.")
+        print("//> Checking local config files.")
         self.check_files()
 
         req = requests.get(oybotpy, timeout=10)
@@ -184,21 +184,21 @@ class update ():
         mainFile = os.path.isfile("oybot.py") 
 
         if verFile:
-            print("»»»» Removing old file")
+            print("//> Removing old file")
             os.remove("androyd.py") 
         if mainFile:
-            print("»»»» Starting update check")
+            print("//> Starting update check")
             if self.versionCheck():
                 self.saveFileF("oybot.py", req.text)
-                print("»»»» Starting to Updating 'oybot.py'")
+                print("//> Starting to Updating 'oybot.py'")
             else:
-                print("»»»» Oybot is already up to date.")
+                print("//> Oybot is already up to date.")
         else:
-            print("»»»» Creating new 'Oybot.py' and writng data to file.")
+            print("//> Creating new 'Oybot.py' and writng data to file.")
             self.saveFileF("oybot.py", req.text)
         
     def cleanCache(self):
-        print("»»»» Cleaning Cache files")
+        print("//> Cleaning Cache files")
         os.system('rmdir __pycache__ /s /q')
         
 
@@ -225,9 +225,9 @@ class update ():
 
         if cloud_ver > local_ver:
             self.saveFileF("updater.py", up_ver)
-            print("»»»» A new update to updater has been installed, please restart.")
+            print("//> A new update to updater has been installed, please restart.")
         else:
-            print("»»»» Updater is up to date.")
+            print("//> Updater is up to date.")
             should_run = True
 
         localUpdater.close()
