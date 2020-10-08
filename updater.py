@@ -1,4 +1,4 @@
-# 1.0
+# 1.1
 import json
 import os
 import sys
@@ -79,6 +79,7 @@ class update ():
                 ext = ".command"
 
         start_oybot             = ccd + start_oybot             + pause
+        start_update             = ccd + start_update             + pause
 
         files = {
             "start_oybot"             + ext : start_oybot,
