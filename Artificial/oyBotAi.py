@@ -1,3 +1,4 @@
+#1.0
 import os
 import operator
 import enchant
