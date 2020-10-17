@@ -1,4 +1,4 @@
-# 1.1
+# 1.2
 import json
 import os
 import sys
@@ -16,6 +16,12 @@ oybotpy = "https://raw.githubusercontent.com/RingoMar/androyd/master/oybot.py"
 verson = "https://raw.githubusercontent.com/RingoMar/androyd/master/version.json"
 reqf = "https://raw.githubusercontent.com/RingoMar/androyd/master/requirements.text"
 updaterf = "https://raw.githubusercontent.com/RingoMar/androyd/master/updater.py"
+aiWrapper = "https://raw.githubusercontent.com/RingoMar/androyd/master/Artificial/oyBotAi.py"
+aiBinary = "https://raw.githubusercontent.com/RingoMar/androyd/master/Artificial/ml.py"
+baseLink = "https://raw.githubusercontent.com/RingoMar/androyd/master/Artificial/"
+srcDependencies = ["src/b-data.pkl", "src/b-model.pkl", "src/data.json", "src/reply.json"]
+
+
 intro = """
 :::::::::::::::>>>>>>>>>>>>>>>>>>::::::::::::::::::::
 .....................................................
@@ -49,11 +55,18 @@ class update ():
             outfile.close()
         return
 
+    def saveFileFB(self, infile, data):
+        dumpFile = open(infile, "wb")
+        dumpFile.write(bytes(data, "UTF-8"))
+        dumpFile.close()
+        return
+
     def saveFileF(self, infile, data):
         dumpFile = open(infile, "w")
         dumpFile.write(data)
         dumpFile.close()
         return
+
 
     def create_fast_start_scripts(self):
         interpreter = sys.executable
@@ -62,8 +75,10 @@ class update ():
 
         call = "\"{}\" oybot.py".format(interpreter)
         calll = "\"{}\" updater.py".format(interpreter)
+        callll = "\"{}\" ./Artificial/oyBotAi.py".format(interpreter)
         start_oybot = "{} --start".format(call)
         start_update = "{}".format(calll)
+        start_Ai = "{}".format(callll)
         modified = False
 
         if self.IS_WINDOWS:
@@ -78,12 +93,14 @@ class update ():
             else:
                 ext = ".command"
 
-        start_oybot             = ccd + start_oybot             + pause
-        start_update             = ccd + start_update             + pause
+        start_oybot = ccd + start_oybot + pause
+        start_update = ccd + start_update + pause
+        start_Ai = ccd + start_Ai + pause
 
         files = {
             "start_oybot"             + ext : start_oybot,
-            "start_update"             + ext : start_update
+            "start_update"             + ext : start_update,
+            "start_Ai"             + ext : start_Ai
         }
 
         if not self.IS_WINDOWS:
@@ -109,13 +126,13 @@ class update ():
         if verFile:
             if req["version"] > self.loadFile("version.json")["version"]:
                 print(f"//> Oybot {req['version']} is ready for install...")
-                saveFile("version.json", req)
+                self.saveFile("version.json", req)
                 versionReturn = True
             else:
                 versionReturn = False
         else:
             print('//> 404 "version.json" not found\nDownloading update anyway.')
-            saveFile("version.json", req)
+            self.saveFile("version.json", req)
             versionReturn = True
         return versionReturn
 
@@ -133,21 +150,74 @@ class update ():
                 self.saveFile("{}".format(filename), value)
 
     def clearFiles(self):
+        
+        if self.Userconfirm():
+            files = {
+                "config.json" : {"talk": ["Zaq smells raccPog"], "interval": 1800, "blacklisthello": ["tahhp", "richardharrow_", "oythebrave", "dwingert", "msotaku", "nightbot", "jediknight223", "classickerobel", "ringomar"]},
+                "fragmentnames.json" : {},
+                "creds.json" : {"cid": "", "OAuth": ""},
+            }
 
-        files = {
-            "config.json" : {"talk": ["Zaq smells raccPog"], "interval": 1800, "blacklisthello": ["tahhp", "richardharrow_", "oythebrave", "dwingert", "msotaku", "nightbot", "jediknight223", "classickerobel", "ringomar"]},
-            "fragmentnames.json" : {},
-            "creds.json" : {"cid": "", "OAuth": ""},
-        }
+            for filename, value in files.items():
+                print("//> Cleaning File {}".format(filename))
+                self.saveFile("{}".format(filename), value)
 
-        for filename, value in files.items():
-            print("//> Cleaning File {}".format(filename))
-            self.saveFile("{}".format(filename), value)
+    def checkFolder(self):
+        folders = ("Artificial", "Artificial/src/")
+        for folder in folders:
+            if not os.path.exists(folder):
+                print("//> Creating " + folder + " folder...")
+                os.makedirs(folder)
+
+    def updateAI(self):
+        baseWrapper = os.path.isfile("./Artificial/oyBotAi.py")
+        if baseWrapper:
+            up_ver = requests.get(aiWrapper, timeout=10).text
+            cl_ver = up_ver.split("\n")
+            cloud_ver = float(cl_ver[0].replace("#", "").replace(" ", ""))
+
+            localUpdater = open("Artificial/oyBotAi.py", "r")
+            first_line = localUpdater.readlines()[0]
+            local_ver = float(first_line.replace("#", "").replace(" ", ""))
+
+            if cloud_ver > local_ver:
+                print("//> Updating Oybot Ai")
+                print("//> Updating wrappers")
+                wrapper1 = requests.get(aiWrapper, timeout=10).text
+                wrapper2 = requests.get(aiBinary, timeout=10).text
+                self.saveFileF("./Artificial/oyBotAi.py", wrapper1)
+                self.saveFileF("./Artificial/ml.py", wrapper2)
+                print("//> Updating dependencies")
+                for srcFile in srcDependencies:
+                    srcLink = baseLink + srcFile
+                    dependency = requests.get(srcLink, timeout=10).text
+                    self.saveFileFB("./Artificial/" + srcFile, dependency)
+                    print("//> Writing data for:", "/Artificial/" + srcFile)
+            else:
+                print("//> Oybot Ai is running on the latest version.")
+        else:
+            print("//> Ai files not found\n\n")
+            print("//> Updating Oybot Ai")
+            print("//> Updating wrappers")
+            wrapper1 = requests.get(aiWrapper, timeout=10).text
+            wrapper2 = requests.get(aiBinary, timeout=10).text
+            self.saveFileF("./Artificial/oyBotAi.py", wrapper1)
+            self.saveFileF("./Artificial/ml.py", wrapper2)
+            print("//> Updating dependencies")
+            for srcFile in srcDependencies:
+                srcLink = baseLink + srcFile
+                dependency = requests.get(srcLink, timeout=10).text
+                self.saveFileFB("./Artificial/" + srcFile, dependency)
+                print("//> Writing data for:", "/Artificial/" + srcFile)
+
+
+        return
 
     def updateLite(self):
         req = requests.get(oybotpy, timeout=10)
         verFile = os.path.isfile("androyd.py") 
         mainFile = os.path.isfile("oybot.py") 
+        self.checkFolder()
         if verFile:
             print("//> Removing old file")
             os.remove("androyd.py") 
@@ -161,10 +231,13 @@ class update ():
         else:
             print("//> Creating new 'Oybot.py' and writng data to file.")
             self.saveFileF("oybot.py", req.text)
+            
+        self.updateAI()
 
     def update(self):
         requir = os.path.isfile("requirements.text") 
         reqc = requests.get(reqf, timeout=10)
+        self.checkFolder()
         if requir:
             os.system('pip install -r requirements.text')
         else:
@@ -198,9 +271,12 @@ class update ():
             print("//> Creating new 'Oybot.py' and writng data to file.")
             self.saveFileF("oybot.py", req.text)
         
+        self.updateAI()
+
     def cleanCache(self):
-        print("//> Cleaning Cache files")
-        os.system('rmdir __pycache__ /s /q')
+        if self.Userconfirm():
+            print("//> Cleaning Cache files")
+            os.system('rmdir __pycache__ /s /q')
         
 
     def Userconfirm(self):
@@ -208,7 +284,7 @@ class update ():
         yes = ("yes", "y")
         no = ("no", "n")
         while choice not in yes and choice not in no:
-            choice = input("Yes/No > ").lower().strip()
+            choice = input("are you sure? Yes/No > ").lower().strip()
         return choice in yes
 
     def run(self):
