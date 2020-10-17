@@ -1,0 +1,153 @@
+{
+  "intents": [
+    {
+      "tag": "untrained",
+      "patterns": [""],
+      "responses": ["I Don't understand. :("],
+      "context": [""]
+    },
+    {
+      "tag": "robot",
+      "patterns": [
+        "are you a robot?",
+        "are you a bot?",
+        "are you a chatbot?",
+        "is dumb",
+        "is an idiot",
+        "is a thing",
+        "are you real?",
+        "MrDestructoid",
+        "is old,"
+      ],
+      "responses": ["Im, an advanced artificial intelligence."],
+      "context": [""]
+    },
+    {
+      "tag": "name",
+      "patterns": ["What is your name?"],
+      "responses": ["oybot."],
+      "context": [""]
+    },
+    {
+      "tag": "fingerRichard",
+      "patterns": [
+        "peepoFinger",
+        "zaqSquint",
+        "10-3",
+        "shut up peepoFinger",
+        "Fuck you",
+        "sucks"
+      ],
+      "responses": ["peepoFinger right back at ya"],
+      "context": [""]
+    },
+    {
+      "tag": "feelings",
+      "patterns": [
+        "How are you?",
+        "what's up?",
+        "sup",
+        "hey",
+        "hello",
+        "how's things?",
+        "pokes with a stick",
+        "MLADY"
+      ],
+      "responses": ["Sup."],
+      "context": [""]
+    },
+    {
+      "tag": "speed",
+      "patterns": ["is faster than me"],
+      "responses": ["I am speed."],
+      "context": [""]
+    },
+    {
+      "tag": "here",
+      "patterns": ["no here", "is dead", "modCheck"],
+      "responses": ["pugPls Im here pugPls"],
+      "context": [""]
+    },
+    {
+      "tag": "saddnees",
+      "patterns": [
+        "no",
+        "DESKCHAN",
+        "is broken",
+        "is creepy",
+        "I'm just memeing",
+        "Shut up",
+        "Smells funny",
+        "Except"
+      ],
+      "responses": ["Okay. :(", "I'm sorry :("],
+      "context": [""]
+    },
+    {
+      "tag": "goodbot",
+      "patterns": [
+        "is the best",
+        "PETTHERACCOON",
+        "good job",
+        " NODDERS PETTHERACCOON",
+        "Yes",
+        "zaqHug",
+        "Good"
+      ],
+      "responses": ["Thanks zaqAWA"],
+      "context": [""]
+    },
+    {
+      "tag": "nerds",
+      "patterns": ["ur a nerd", "yer a nerd", "nerds"],
+      "responses": ["NO U"],
+      "context": [""]
+    },
+    {
+      "tag": "rp",
+      "patterns": ["Do you watch rp", "rp", "role player", "rp nerd"],
+      "responses": ["Let's not talk about RP.", "You are a rp nerd."],
+      "context": [""]
+    },
+    {
+      "tag": "brithday",
+      "patterns": ["Happy bday", "Happy brithday"],
+      "responses": ["FeelsBirthdayMan"],
+      "context": [""]
+    },
+    {
+      "tag": "8ball",
+      "patterns": [
+        "are you just giving me",
+        "Are you sure",
+        "can we",
+        "can you",
+        "could we",
+        "Did i",
+        "does",
+        "how do I give someone",
+        "i got a question",
+        "is it possible",
+        "Is it True",
+        "Is my",
+        "lemon party",
+        "Should I find",
+        "where",
+        "Why am I",
+        "Why do I have",
+        "why don't the",
+        "would we",
+        "would",
+        "you got a question"
+      ],
+      "responses": [
+        "Doubtful...",
+        "err",
+        "No",
+        "Yes",
+        "Not sure, likely yes :)"
+      ],
+      "context": [""]
+    }
+  ]
+}
