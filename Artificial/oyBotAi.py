@@ -141,8 +141,8 @@ class oyBotMain():
                         except AttributeError:
                             DPN += "Chatter"
 
-                    if "oybot" in mlMsg.lower():
-                    # if "oybot" in mlMsg.lower() and DPN.lower() != botname:
+                    # if "oybot" in mlMsg.lower():
+                    if "oybot" in mlMsg.lower() and DPN.lower() != botname:
                         p = rinProcess().think(mlMsg.replace("oybot", ""))
                         print(p)
                         with open('src/data.json', "rb") as json_data:
