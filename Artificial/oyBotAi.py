@@ -56,7 +56,7 @@ except IndexError:
     botname = "Oythebrave"
     chan = "#zaquelle"
 
-replay = loadFile("src/reply.json")
+replay = loadFile("Artificial/src/reply.json")
 
 startText = """
 :::::::::::::::>>>>>>>>>>>>>>>>>>::::::::::::::::::::
@@ -145,7 +145,7 @@ class oyBotMain():
                     if "oybot" in mlMsg.lower() and DPN.lower() != botname:
                         p = rinProcess().think(mlMsg.replace("oybot", ""))
                         print(p)
-                        with open('src/data.json', "rb") as json_data:
+                        with open('Artificial/src/data.json', "rb") as json_data:
                             intents = json.load(json_data)
 
                         for x in range(0, len(intents["intents"])):

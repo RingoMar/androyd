@@ -28,8 +28,8 @@ classes = []
 documents = []
 ignore_words = ['?']
 
-bFile = "src/b-data.pkl"
-bmod = "src/b-model.pkl"
+bFile = "Artificial/src/b-data.pkl"
+bmod = "Artificial/src/b-model.pkl"
 
 def check_files():
     """
