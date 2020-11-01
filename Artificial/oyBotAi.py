@@ -1,4 +1,4 @@
-#1.0
+#1.1
 import os
 import operator
 import enchant
