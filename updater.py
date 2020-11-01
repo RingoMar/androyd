@@ -1,4 +1,4 @@
-# 1.2
+# 1.3
 import json
 import os
 import sys
@@ -18,8 +18,10 @@ reqf = "https://raw.githubusercontent.com/RingoMar/androyd/master/requirements.t
 updaterf = "https://raw.githubusercontent.com/RingoMar/androyd/master/updater.py"
 aiWrapper = "https://raw.githubusercontent.com/RingoMar/androyd/master/Artificial/oyBotAi.py"
 aiBinary = "https://raw.githubusercontent.com/RingoMar/androyd/master/Artificial/ml.py"
+aiTrain = "https://raw.githubusercontent.com/RingoMar/androyd/master/Artificial/train.py"
+aiTrainBat = "https://raw.githubusercontent.com/RingoMar/androyd/master/Artificial/train.bat"
 baseLink = "https://raw.githubusercontent.com/RingoMar/androyd/master/Artificial/"
-srcDependencies = ["src/b-data.pkl", "src/b-model.pkl", "src/data.json", "src/reply.json"]
+srcDependencies = ["src/data.json", "src/reply.json"]
 
 
 intro = """
@@ -185,8 +187,12 @@ class update ():
                 print("//> Updating wrappers")
                 wrapper1 = requests.get(aiWrapper, timeout=10).text
                 wrapper2 = requests.get(aiBinary, timeout=10).text
+                wrapper3 = requests.get(aiTrain, timeout=10).text
+                wrapper4 = requests.get(aiTrainBat, timeout=10).text
                 self.saveFileF("./Artificial/oyBotAi.py", wrapper1)
                 self.saveFileF("./Artificial/ml.py", wrapper2)
+                self.saveFileF("./Artificial/train.py", wrapper3)
+                self.saveFileF("./Artificial/train.bat", wrapper4)
                 print("//> Updating dependencies")
                 for srcFile in srcDependencies:
                     srcLink = baseLink + srcFile
@@ -201,8 +207,12 @@ class update ():
             print("//> Updating wrappers")
             wrapper1 = requests.get(aiWrapper, timeout=10).text
             wrapper2 = requests.get(aiBinary, timeout=10).text
+            wrapper3 = requests.get(aiTrain, timeout=10).text
+            wrapper4 = requests.get(aiTrainBat, timeout=10).text
             self.saveFileF("./Artificial/oyBotAi.py", wrapper1)
             self.saveFileF("./Artificial/ml.py", wrapper2)
+            self.saveFileF("./Artificial/train.py", wrapper3)
+            self.saveFileF("./Artificial/train.bat", wrapper4)
             print("//> Updating dependencies")
             for srcFile in srcDependencies:
                 srcLink = baseLink + srcFile
