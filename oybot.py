@@ -78,13 +78,13 @@ class sitinchat(Thread):
 
     def cache_viewer(self):
         try:
-            if sys.argv[1] == "cache_wave":
-                viewlist = requests.get('https://tmi.twitch.tv/group/user/zaquelle/chatters', timeout=10).json()
-                outterChatters = viewlist["chatters"]
-                for vkey in outterChatters.keys():
-                    vinner =  outterChatters[vkey]
-                    for innviewer in vinner:
-                        self.seen[innviewer] = True
+            # if sys.argv[1] == "cache_wave":
+            viewlist = requests.get('https://tmi.twitch.tv/group/user/zaquelle/chatters', timeout=10).json()
+            outterChatters = viewlist["chatters"]
+            for vkey in outterChatters.keys():
+                vinner =  outterChatters[vkey]
+                for innviewer in vinner:
+                    self.seen[innviewer] = True
         except: 
             pass
 
