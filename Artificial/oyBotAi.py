@@ -1,4 +1,4 @@
-#1.1
+#1.2
 import os
 import operator
 import enchant
@@ -22,7 +22,6 @@ from ml import rinProcess
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
 
 init()
- 
 sock = socket.socket()
 analyzer = SentimentIntensityAnalyzer()
 lastping = ""
@@ -42,19 +41,11 @@ def saveFile(infile, data):
         json.dump(data, outfile, indent=4)
         outfile.close()
     return
-try:
-    if sys.argv[1]:
-        print(Fore.RED + ">>>RUNNING ON DEV VERSION" + Style.RESET_ALL)
 
-        cid = loadFile("creds2.json")["cid"]
-        OAuth = loadFile("creds2.json")["OAuth"]
-        botname = "ringomar"
-        chan = "#ringobott"
-except IndexError:
-    cid = loadFile("creds2.json")["cid"]
-    OAuth = loadFile("creds2.json")["OAuth"]
-    botname = "Oythebrave"
-    chan = "#zaquelle"
+cid = loadFile("creds2.json")["cid"]
+OAuth = loadFile("creds2.json")["OAuth"]
+botname = "Oythebrave"
+chan = "#zaquelle"
 
 replay = loadFile("Artificial/src/reply.json")
 
