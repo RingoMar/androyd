@@ -19,7 +19,7 @@
         "MrDestructoid",
         "is old,"
       ],
-      "responses": ["Im, an advanced artificial intelligence."],
+      "responses": ["I am an advanced artificial intelligence."],
       "context": [""]
     },
     {
@@ -32,28 +32,40 @@
       "tag": "fingerRichard",
       "patterns": [
         "peepoFinger",
-        "zaqSquint",
         "10-3",
         "shut up peepoFinger",
         "Fuck you",
         "sucks"
       ],
-      "responses": ["peepoFinger right back at ya"],
+      "responses": [
+        "peepoFinger right back at ya",
+        "Hate me now, bow down to me later MrDestructoid",
+        "How about PogOFF",
+        "oyOldA Yall hear something?",
+        "Shhhhhhhhh.",
+        "oyRage"
+      ],
+      "context": [""]
+    },
+    {
+      "tag": "modings",
+      "patterns": ["ban", "chat behaving"],
+      "responses": ["Ok.", "alright", "I want to ban someone."],
       "context": [""]
     },
     {
       "tag": "feelings",
-      "patterns": [
-        "How are you?",
-        "what's up?",
-        "sup",
-        "hey",
-        "hello",
-        "how's things?",
-        "pokes with a stick",
-        "MLADY"
+      "patterns": ["sup", "hey", "hello", "pokes with a stick", "MLADY"],
+      "responses": ["Hello :)", "Hi", "zaqHi"],
+      "context": [""]
+    },
+    {
+      "tag": "feelings2",
+      "patterns": ["How are you?", "what's up?"],
+      "responses": [
+        "I'm good how are you?",
+        "Expanding my bot network MrDestructoid"
       ],
-      "responses": ["Sup."],
       "context": [""]
     },
     {
@@ -77,6 +89,7 @@
         "is creepy",
         "I'm just memeing",
         "Shut up",
+        "kind of dumb",
         "Smells funny",
         "Except"
       ],
