@@ -431,7 +431,7 @@ class sitinchat(Thread):
                     try:
                         greetName = DPN.lower()
                         self.lastHello["name"] = greetName
-                        if greetingWords:
+                        if greetingWords and not "bigfollows" in str(pri[1]).lower():
                             if self.shouldSayHi(greetName):
                                 if greetName not in self.seen.keys():
                                     sock.send(("PRIVMSG {} :{} {}\r\n").format(chan, random.choice(greetings), self.seed_name(DPN)).encode("utf-8"))
@@ -444,7 +444,7 @@ class sitinchat(Thread):
                                 self.seen[greetName] = True
                                 print(Fore.BLUE + "[GREETING INFO] " + f"[{pringtime}]" + Style.RESET_ALL + f"{DPN} Doesn't like when I say Hi to them. sadKEK")
 
-                        elif greetName not in self.seen.keys():
+                        elif greetName not in self.seen.keys() and not "bigfollows" in str(pri[1]).lower():
                             if self.shouldSayHi(greetName):
                                 if greetName not in self.seen.keys():
                                     sock.send(("PRIVMSG {} :{} {}\r\n").format(chan, random.choice(greetings), self.seed_name(DPN)).encode("utf-8"))
