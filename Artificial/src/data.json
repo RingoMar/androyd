@@ -19,13 +19,63 @@
         "MrDestructoid",
         "is old,"
       ],
-      "responses": ["I am an advanced artificial intelligence."],
+      "responses": [
+        "I am OyBot.",
+        "I am the real oy",
+        "i am not a robot",
+        "dont talk to me",
+        "ill add you to the blacklist",
+        "/me looks the other way",
+        "yea ok"
+      ],
       "context": [""]
     },
     {
       "tag": "name",
       "patterns": ["What is your name?"],
       "responses": ["oybot."],
+      "context": [""]
+    },
+    {
+      "tag": "facts",
+      "patterns": ["cool fact", "facts", "fun fact"],
+      "responses": [
+        "Rubber bands will last much longer when they are refrigerated.",
+        "There are 293 ways to make change for a dollar.",
+        "The Grand Theft Auto franchise has lawsuits that total over $1 billion.",
+        "All clocks in Pulp Fiction are set to 4:20.",
+        "The eye of an ostrich is bigger than its brain.",
+        "A dime has 118 ridges on its edge.",
+        "The largest pair of eyes in the world belongs to the giant squid.",
+        "The dot over the small letter 'i' is called a title.",
+        "Japan has 23 vending machines per person.",
+        "Soccer balls were once used for playing basketball.",
+        "A candle’s flame is hot and blue in zero gravity.",
+        "Putting sugar on a cut will make it heal faster.",
+        "The plastic tips of shoelaces are called aglets.",
+        "Penguins fly underwater.",
+        "75 burgers are sold in McDonald’s every second.",
+        "1,700 people become millionaires every day in the U.S.",
+        "You can’t hum while holding your nose.",
+        "You are more likely to have a weird or scary dream when sleeping on your stomach.",
+        "Your eyeballs do not grow or change their size as you age.",
+        "Blue-eyed people have higher alcohol tolerance.",
+        "Smelling green apples help with weight loss.",
+        "A snail has 2,500 teeth.",
+        "Pigeons can't fart.",
+        "You can die from staying up for two weeks straight.",
+        "One strand of hair can hold up to 3 ounces of weight.",
+        "Watching horror movies before viewing abstract art will enhance the experience.",
+        "Children’s book author, Roald Dahl was a spy.",
+        "NASCAR drivers lose weight while racing.",
+        "Cap'n Crunch was once sued for not using real berries.",
+        "The most widely printed book in the world is the catalog for IKEA.",
+        "Crocodiles are one of the planet’s oldest living creatures.",
+        "The salty taste of bacon isn’t natural.",
+        "Your funny bone is a nerve.",
+        "Pineapples are named after pinecones.",
+        "New Zealand was once auctioned on eBay."
+      ],
       "context": [""]
     },
     {
@@ -55,29 +105,35 @@
     },
     {
       "tag": "feelings",
-      "patterns": ["sup", "hey", "hello", "pokes with a stick", "MLADY"],
+      "patterns": ["sup", "hi", "hey", "hello", "pokes with a stick", "MLADY"],
       "responses": ["Hello :)", "Hi", "zaqHi"],
       "context": [""]
     },
     {
       "tag": "feelings2",
-      "patterns": ["How are you?", "what's up?"],
+      "patterns": ["how are you", "what's up"],
       "responses": [
         "I'm good how are you?",
-        "Expanding my bot network MrDestructoid"
+        "Expanding my bot network MrDestructoid",
+        "Making memes"
       ],
       "context": [""]
     },
     {
       "tag": "speed",
       "patterns": ["is faster than me"],
-      "responses": ["I am speed."],
+      "responses": ["I am speed.", "yes.", "mhm mhm"],
       "context": [""]
     },
     {
       "tag": "here",
       "patterns": ["no here", "is dead", "modCheck"],
-      "responses": ["pugPls Im here pugPls"],
+      "responses": [
+        "pugPls Im here pugPls",
+        "BoneZone oybot is here BoneZone",
+        "You want me dead and i know it.",
+        ""
+      ],
       "context": [""]
     },
     {
@@ -93,7 +149,19 @@
         "Smells funny",
         "Except"
       ],
-      "responses": ["Okay. :(", "I'm sorry :("],
+      "responses": ["Okay. :(", "I'm sorry :(", "hmm"],
+      "context": [""]
+    },
+    {
+      "tag": "roll",
+      "patterns": ["Fight me", "roll"],
+      "responses": ["!roll lets go", "!roll", "You roll"],
+      "context": [""]
+    },
+    {
+      "tag": "hugs",
+      "patterns": ["zaqHug"],
+      "responses": ["zaqHugA"],
       "context": [""]
     },
     {
@@ -102,30 +170,35 @@
         "is the best",
         "PETTHERACCOON",
         "good job",
-        " NODDERS PETTHERACCOON",
+        "NODDERS PETTHERACCOON",
         "Yes",
         "zaqHug",
         "Good"
       ],
-      "responses": ["Thanks zaqAWA"],
+      "responses": ["Thanks zaqAWA", "ok", "Yup"],
       "context": [""]
     },
     {
       "tag": "nerds",
       "patterns": ["ur a nerd", "yer a nerd", "nerds"],
-      "responses": ["NO U"],
+      "responses": ["NO U", "yes", "you sure?", "who you talking to?"],
       "context": [""]
     },
     {
       "tag": "rp",
       "patterns": ["Do you watch rp", "rp", "role player", "rp nerd"],
-      "responses": ["Let's not talk about RP.", "You are a rp nerd."],
+      "responses": [
+        "Let's not talk about RP.",
+        "You are a rp nerd.",
+        "rp?",
+        "You mean RPS?"
+      ],
       "context": [""]
     },
     {
       "tag": "brithday",
       "patterns": ["Happy bday", "Happy brithday"],
-      "responses": ["FeelsBirthdayMan"],
+      "responses": ["FeelsBirthdayMan", "uhh thanks", "no", "stop"],
       "context": [""]
     },
     {
@@ -153,13 +226,7 @@
         "would",
         "you got a question"
       ],
-      "responses": [
-        "Doubtful...",
-        "err",
-        "No",
-        "Yes",
-        "Not sure, likely yes :)"
-      ],
+      "responses": ["err", "No", "Yes"],
       "context": [""]
     }
   ]

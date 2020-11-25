@@ -1,4 +1,4 @@
-#1.3
+#1.4
 import os
 import operator
 import enchant
@@ -72,8 +72,15 @@ class oyBotMain():
         self.intentsList = ""
         self.lastmessage = ""
 
+    def randomPick(self, aList):
+        try:
+            fullList = random.sample(aList, 3)
+            return fullList[1]
+        except ValueError:
+            liteList = random.sample(aList, len(aList))
+            return liteList[0]
+
     def connectsock(self):
-        global oyBotSockConnect
         print(Fore.GREEN + startText + Style.RESET_ALL)
         print(Fore.GREEN + "[INFO] " + Style.RESET_ALL + "Trying to connect to... irc.twitch.tv:6667")
         verFile = loadFile("version.json")
@@ -101,7 +108,6 @@ class oyBotMain():
     # MACHINE LEARNING MODULE                  #
     ############################################
     def oyBotML(self):
-        pringtime = ("{:{tfmt}}".format(dt.now(), tfmt="%H:%M:%S"))
         buffer = ""
         buffer += sock.recv(2048).decode('utf-8')
         temp = buffer.split("\r\n")
@@ -110,13 +116,11 @@ class oyBotMain():
             for line in temp:
                 _line = str(line.encode("utf-8").decode("utf-8"))
                 if line == "PING :tmi.twitch.tv":
-                    lastping = dt.now().strftime('%Y%m%d%H%M%S')
                     sock.send("PONG :tmi.twitch.tv\r\n".encode("utf-8"))
 
                 if "PRIVMSG" in _line:
                     DPN = ""
                     stream = re.search(r"#([a-zA-Z0-9-_\w]+) :", _line)
-                    currchan = stream.group(1)
                     findprv = ("PRIVMSG #{} :".format(stream.group(1)))
                     pri = _line.split(findprv)
                     mlMsg = pri[1]
@@ -132,28 +136,31 @@ class oyBotMain():
                         except AttributeError:
                             DPN += "Chatter"
 
-                    # if "oybot" in mlMsg.lower():
-                    if "oybot" in mlMsg.lower() and DPN.lower() != botname:
+                    if "oybot" in mlMsg.lower():
+                    # if "oybot" in mlMsg.lower() and DPN.lower() != botname.lower():
                         p = rinProcess().think(mlMsg.replace("oybot", ""))
-                        print(p)
-                        with open('Artificial/src/data.json', "rb") as json_data:
-                            intents = json.load(json_data)
+                        if p == "":
+                            pass
+                        else:
+                            print(p)
+                            with open('Artificial/src/data.json', "rb") as json_data:
+                                intents = json.load(json_data)
 
-                        for x in range(0, len(intents["intents"])):
-                            if p == [] or str(p[0][0]) == "untrained":
-                                score = analyzer.polarity_scores(mlMsg.replace("oybot", ""))
-                                if score['compound'] > 0.05:
-                                    result = replay['pos']
-                                elif score['compound'] < -0.05:
-                                    result = replay['neg']
-                                else:
-                                    result = replay['neu']
+                            for x in range(0, len(intents["intents"])):
+                                if p == [] or str(p[0][0]) == "untrained":
+                                    score = analyzer.polarity_scores(mlMsg.replace("oybot", ""))
+                                    if score['compound'] > 0.05:
+                                        result = replay['pos']
+                                    elif score['compound'] < -0.05:
+                                        result = replay['neg']
+                                    else:
+                                        result = replay['neu']
 
-                                self.intentsList = result
-                            elif str(intents["intents"][x]["tag"]) == str(p[0][0]):
-                                self.intentsList = intents["intents"][x]["responses"]
-                                
-                        sock.send(("PRIVMSG {} :{}\r\n").format(chan, random.choice(self.intentsList)).encode("utf-8"))
+                                    self.intentsList = result
+                                elif str(intents["intents"][x]["tag"]) == str(p[0][0]):
+                                    self.intentsList = intents["intents"][x]["responses"]
+                                    
+                            sock.send(("PRIVMSG {} :{}\r\n").format(chan, self.randomPick(self.intentsList)).encode("utf-8"))
 
 
         except Exception as e:
