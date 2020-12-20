@@ -30,4 +30,3 @@ jobs:
           prerelease: false
           token: ${{secrets.GITHUB_TOKEN}}
           artifacts: './oybot.zip, ./version.json'
-          tag: ${{ steps.get-version.outputs.version }}
